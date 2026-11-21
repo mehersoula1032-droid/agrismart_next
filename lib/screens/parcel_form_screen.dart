@@ -22,6 +22,8 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   late TextEditingController _humidityController;
   late TextEditingController _thresholdController;
   late TextEditingController _locationController;
+  late TextEditingController _latController;
+  late TextEditingController _lngController;
 
   bool get isEditing => widget.parcel != null;
 
@@ -45,6 +47,12 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     _locationController = TextEditingController(
       text: parcel?.location ?? '',
     );
+    _latController = TextEditingController(
+      text: parcel?.latitude != null ? parcel!.latitude.toString() : '',
+    );
+    _lngController = TextEditingController(
+      text: parcel?.longitude != null ? parcel!.longitude.toString() : '',
+    );
   }
 
   @override
@@ -55,6 +63,8 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     _humidityController.dispose();
     _thresholdController.dispose();
     _locationController.dispose();
+    _latController.dispose();
+    _lngController.dispose();
     super.dispose();
   }
 
@@ -79,6 +89,19 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     return null;
   }
 
+  String? _validateCoordinate(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null; // optionnel
+    }
+
+    final number = double.tryParse(value.replaceAll(',', '.'));
+    if (number == null) {
+      return 'Coordonnée invalide';
+    }
+
+    return null;
+  }
+
   Widget _buildField({
     required String label,
     required TextEditingController controller,
@@ -92,7 +115,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       controller: controller,
       validator: validator,
       keyboardType: isNumeric
-          ? const TextInputType.numberWithOptions(decimal: true)
+          ? const TextInputType.numberWithOptions(decimal: true, signed: true)
           : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
@@ -119,10 +142,23 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     );
   }
 
+  void _setDefaultGpsCoordinates() {
+    setState(() {
+      _latController.text = '33.7050';
+      _lngController.text = '8.9650';
+    });
+  }
+
   void _saveParcel() {
     if (!_formKey.currentState!.validate()) return;
 
     final provider = context.read<ParcelProvider>();
+
+    final latText = _latController.text.replaceAll(',', '.').trim();
+    final lngText = _lngController.text.replaceAll(',', '.').trim();
+
+    final latitude = latText.isNotEmpty ? double.tryParse(latText) : null;
+    final longitude = lngText.isNotEmpty ? double.tryParse(lngText) : null;
 
     final parcel = Parcel(
       id: widget.parcel?.id ??
@@ -133,6 +169,8 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       humidity: double.parse(_humidityController.text.replaceAll(',', '.')),
       threshold: double.parse(_thresholdController.text.replaceAll(',', '.')),
       location: _locationController.text.trim(),
+      latitude: latitude,
+      longitude: longitude,
     );
 
     if (isEditing) {
@@ -265,6 +303,57 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                 icon: Icons.location_on_outlined,
                 hint: 'Ex: Kébili',
                 validator: _validateText,
+              ),
+
+              const SizedBox(height: 28),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Position GPS (Marqueur carte)',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: _setDefaultGpsCoordinates,
+                    icon: const Icon(Icons.my_location, size: 18, color: green),
+                    label: const Text(
+                      'Ex. Kébili',
+                      style: TextStyle(color: green, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildField(
+                      label: 'Latitude',
+                      controller: _latController,
+                      icon: Icons.map,
+                      hint: 'Ex: 33.7050',
+                      isNumeric: true,
+                      validator: _validateCoordinate,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildField(
+                      label: 'Longitude',
+                      controller: _lngController,
+                      icon: Icons.map_outlined,
+                      hint: 'Ex: 8.9650',
+                      isNumeric: true,
+                      validator: _validateCoordinate,
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 28),
