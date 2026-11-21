@@ -19,6 +19,7 @@ class _PlantRecognitionScreenState
 
   File? selectedImage;
   List<ImageLabel> labels = [];
+
   bool isLoading = false;
   String? errorMessage;
 
@@ -28,21 +29,23 @@ class _PlantRecognitionScreenState
     ),
   );
 
-  Future<void> selectImage() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (image == null) return;
-
-    setState(() {
-      selectedImage = File(image.path);
-      labels = [];
-      errorMessage = null;
-      isLoading = true;
-    });
-
+  // Camera and Gallery
+  Future<void> selectImage(ImageSource source) async {
     try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 85,
+      );
+
+      if (image == null) return;
+
+      setState(() {
+        selectedImage = File(image.path);
+        labels = [];
+        errorMessage = null;
+        isLoading = true;
+      });
+
       final inputImage = InputImage.fromFilePath(image.path);
       final results = await _imageLabeler.processImage(inputImage);
 
@@ -82,8 +85,10 @@ class _PlantRecognitionScreenState
         ),
         backgroundColor: Colors.white,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -95,20 +100,28 @@ class _PlantRecognitionScreenState
                 color: Color(0xFF276738),
               ),
             ),
+
             const SizedBox(height: 8),
+
             const Text(
-              'Choisissez une image pour identifier les éléments '
-                  'présents dans votre plante.',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              'Prenez une photo ou choisissez une image '
+                  'pour analyser votre plante.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
             ),
+
             const SizedBox(height: 24),
 
+            // Image Preview
             Container(
               height: 230,
               decoration: BoxDecoration(
                 color: const Color(0xFFEAF2E8),
                 borderRadius: BorderRadius.circular(18),
               ),
+
               child: selectedImage == null
                   ? const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -126,6 +139,7 @@ class _PlantRecognitionScreenState
                 borderRadius: BorderRadius.circular(18),
                 child: Image.file(
                   selectedImage!,
+                  width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -133,33 +147,72 @@ class _PlantRecognitionScreenState
 
             const SizedBox(height: 20),
 
-            ElevatedButton.icon(
-              onPressed: isLoading ? null : selectImage,
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Choisir une image'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF276738),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-              ),
+            // Camera and Gallery Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: isLoading
+                        ? null
+                        : () => selectImage(ImageSource.camera),
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Caméra'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF276738),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: isLoading
+                        ? null
+                        : () => selectImage(ImageSource.gallery),
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Galerie'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFDDEBDD),
+                      foregroundColor: const Color(0xFF276738),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 24),
 
+            // Loading
             if (isLoading)
-              const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF276738),
-                ),
+              const Column(
+                children: [
+                  CircularProgressIndicator(
+                    color: Color(0xFF276738),
+                  ),
+                  SizedBox(height: 12),
+                  Text('Analyse de votre image...'),
+                ],
               ),
 
+            // Error
             if (errorMessage != null)
               Text(
                 errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(
+                  color: Colors.red,
+                ),
               ),
 
+            // Results
             if (labels.isNotEmpty) ...[
               const Text(
                 'Résultats de l’analyse',
@@ -169,6 +222,7 @@ class _PlantRecognitionScreenState
                   color: Color(0xFF276738),
                 ),
               ),
+
               const SizedBox(height: 12),
 
               ...labels.map(
@@ -178,9 +232,17 @@ class _PlantRecognitionScreenState
                       Icons.eco,
                       color: Color(0xFF276738),
                     ),
-                    title: Text(label.label),
+
+                    title: Text(
+                      label.label,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
                     subtitle: Text(
-                      'Confiance : ${(label.confidence * 100).toStringAsFixed(1)}%',
+                      'Confiance : '
+                          '${(label.confidence * 100).toStringAsFixed(1)}%',
                     ),
                   ),
                 ),
