@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import 'zones_screen.dart';
 import 'statistics_screen.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
+import 'plant_recognition_screen.dart';
 import '../widgets/app_bottom_navigation.dart';
 
 class MainScreen extends StatefulWidget {
@@ -23,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     ZonesScreen(),
     StatisticsScreen(),
+    PlantRecognitionScreen(),
     ProfileScreen(),
   ];
 

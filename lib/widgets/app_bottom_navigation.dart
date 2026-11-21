@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,7 @@ class AppBottomNavigation extends StatelessWidget {
           selectedIcon: Icon(Icons.home),
           label: 'Accueil',
         ),
+
         NavigationDestination(
           icon: Badge(
             isLabelVisible: irrigationCount > 0,
@@ -44,11 +46,19 @@ class AppBottomNavigation extends StatelessWidget {
           ),
           label: 'Zones',
         ),
+
         const NavigationDestination(
           icon: Icon(Icons.analytics_outlined),
           selectedIcon: Icon(Icons.analytics),
           label: 'Statistiques',
         ),
+
+        const NavigationDestination(
+          icon: Icon(Icons.center_focus_weak),
+          selectedIcon: Icon(Icons.center_focus_strong),
+          label: 'Plant Scan',
+        ),
+
         const NavigationDestination(
           icon: Icon(Icons.person_outline),
           selectedIcon: Icon(Icons.person),
