@@ -12,6 +12,8 @@ class MockDataService {
       humidity: 68.0,
       threshold: 45.0,
       location: 'Kébili • Secteur A',
+      latitude: 33.7050,
+      longitude: 8.9650,
     ),
     Parcel(
       id: 'P002',
@@ -21,6 +23,8 @@ class MockDataService {
       humidity: 32.0,
       threshold: 40.0,
       location: 'Kébili • Secteur B',
+      latitude: 33.6980,
+      longitude: 8.9710,
     ),
     Parcel(
       id: 'P003',
@@ -30,6 +34,8 @@ class MockDataService {
       humidity: 55.0,
       threshold: 50.0,
       location: 'Kébili • Secteur C',
+      latitude: 33.7120,
+      longitude: 8.9800,
     ),
     Parcel(
       id: 'P004',
@@ -39,6 +45,8 @@ class MockDataService {
       humidity: 28.0,
       threshold: 45.0,
       location: 'Kébili • Secteur D',
+      latitude: 33.7010,
+      longitude: 8.9550,
     ),
     Parcel(
       id: 'P005',
@@ -48,6 +56,8 @@ class MockDataService {
       humidity: 72.0,
       threshold: 55.0,
       location: 'Kébili • Secteur E',
+      latitude: 33.7065,
+      longitude: 8.9690,
     ),
   ];
 }

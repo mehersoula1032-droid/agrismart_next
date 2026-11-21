@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'gps_farm_mapping_screen.dart';
 import '../providers/auth_provider.dart';
 import 'home_screen.dart';
 import 'zones_screen.dart';
@@ -27,6 +27,7 @@ class _MainScreenState extends State<MainScreen> {
     StatisticsScreen(),
     PlantRecognitionScreen(),
     ProfileScreen(),
+    GPSFarmMappingScreen(), // Nouvel écran GPS
   ];
 
   @override

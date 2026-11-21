@@ -49,7 +49,9 @@ class _QrScannerScreenState extends State<QrScannerScreen>
           _isScanning = false;
         });
 
-        _showScanDialog(context, randomParcel.name, randomParcel.humidity);
+        if (mounted && context.mounted) {
+          _showScanDialog(context, randomParcel.name, randomParcel.humidity);
+        }
       } else {
         setState(() {
           _scanResult = 'Aucun capteur détecté';
@@ -67,8 +69,8 @@ class _QrScannerScreenState extends State<QrScannerScreen>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.qr_code_2, color: Color(0xFF276738)),
             SizedBox(width: 10),
             Text('Capteur Détecté'),
@@ -104,11 +106,13 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             ),
             onPressed: () {
               Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Données du capteur synchronisées !'),
-                ),
-              );
+              if (mounted && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Données du capteur synchronisées !'),
+                  ),
+                );
+              }
             },
             child: const Text('Synchroniser'),
           ),
@@ -247,7 +251,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 
                 if (provider.parcels.isNotEmpty) ...[
                   DropdownButtonFormField<String>(
-                    value: provider.parcels.any((p) => p.id == _selectedParcelId)
+                    initialValue: provider.parcels.any((p) => p.id == _selectedParcelId)
                         ? _selectedParcelId
                         : provider.parcels.first.id,
                     decoration: InputDecoration(
@@ -284,7 +288,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                        color: Colors.black.withAlpha(15),
                         blurRadius: 15,
                       ),
                     ],

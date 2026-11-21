@@ -6,6 +6,8 @@ class Parcel {
   final double humidity;
   final double threshold;
   final String location;
+  final double? latitude;
+  final double? longitude;
 
   const Parcel({
     required this.id,
@@ -15,6 +17,8 @@ class Parcel {
     required this.humidity,
     required this.threshold,
     required this.location,
+    this.latitude,
+    this.longitude,
   });
 
   bool get needsIrrigation => humidity < threshold;
@@ -31,6 +35,8 @@ class Parcel {
     double? humidity,
     double? threshold,
     String? location,
+    double? latitude,
+    double? longitude,
   }) {
     return Parcel(
       id: id ?? this.id,
@@ -40,6 +46,8 @@ class Parcel {
       humidity: humidity ?? this.humidity,
       threshold: threshold ?? this.threshold,
       location: location ?? this.location,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 }
