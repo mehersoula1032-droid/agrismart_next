@@ -1,4 +1,5 @@
-import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserModel {
   final String uid;
@@ -13,46 +14,50 @@ class UserModel {
 }
 
 class AuthService {
-  UserModel? _currentUser = const UserModel(
-    uid: 'u_123',
-    email: 'mehersoula1032@gmail.com',
-    displayName: 'Exploitation AgriSmart',
-  );
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  UserModel? get currentUser => _currentUser;
-  bool get isAuthenticated => _currentUser != null;
+  UserModel? get currentUser {
+    final user = _firebaseAuth.currentUser;
 
-  final StreamController<UserModel?> _authStateController =
-      StreamController<UserModel?>.broadcast();
+    if (user == null) return null;
 
-  Stream<UserModel?> get authStateChanges => _authStateController.stream;
+    return UserModel(
+      uid: user.uid,
+      email: user.email ?? '',
+      displayName: user.displayName ?? user.email?.split('@').first ?? '',
+    );
+  }
+
+  bool get isAuthenticated => _firebaseAuth.currentUser != null;
+
+  Stream<UserModel?> get authStateChanges {
+    return _firebaseAuth.authStateChanges().map((user) {
+      if (user == null) return null;
+
+      return UserModel(
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? user.email?.split('@').first ?? '',
+      );
+    });
+  }
 
   Future<UserModel> signIn({
     required String email,
     required String password,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 600));
-
-    if (email.trim().isEmpty || password.trim().isEmpty) {
-      throw Exception('Veuillez remplir tous les champs');
-    }
-
-    if (!email.contains('@')) {
-      throw Exception('Format d\'adresse email invalide');
-    }
-
-    if (password.length < 4) {
-      throw Exception('Le mot de passe doit contenir au moins 4 caractères');
-    }
-
-    _currentUser = UserModel(
-      uid: DateTime.now().millisecondsSinceEpoch.toString(),
+    final credential = await _firebaseAuth.signInWithEmailAndPassword(
       email: email.trim(),
-      displayName: email.split('@').first,
+      password: password,
     );
 
-    _authStateController.add(_currentUser);
-    return _currentUser!;
+    final user = credential.user!;
+
+    return UserModel(
+      uid: user.uid,
+      email: user.email ?? '',
+      displayName: user.displayName ?? user.email!.split('@').first,
+    );
   }
 
   Future<UserModel> signUp({
@@ -60,35 +65,32 @@ class AuthService {
     required String password,
     required String name,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 600));
-
-    if (email.trim().isEmpty || password.trim().isEmpty) {
-      throw Exception('Veuillez remplir tous les champs');
-    }
-
-    _currentUser = UserModel(
-      uid: DateTime.now().millisecondsSinceEpoch.toString(),
+    final credential = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email.trim(),
-      displayName: name.trim().isEmpty ? email.split('@').first : name.trim(),
+      password: password,
     );
 
-    _authStateController.add(_currentUser);
-    return _currentUser!;
+    final user = credential.user!;
+
+    await user.updateDisplayName(name.trim());
+    await user.reload();
+
+    final updatedUser = _firebaseAuth.currentUser!;
+
+    return UserModel(
+      uid: updatedUser.uid,
+      email: updatedUser.email ?? '',
+      displayName: updatedUser.displayName ?? name.trim(),
+    );
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (email.trim().isEmpty || !email.contains('@')) {
-      throw Exception('Veuillez saisir une adresse email valide');
-    }
-
-    // Email reset request successfully triggered
+    await _firebaseAuth.sendPasswordResetEmail(
+      email: email.trim(),
+    );
   }
 
   Future<void> signOut() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _currentUser = null;
-    _authStateController.add(null);
+    await _firebaseAuth.signOut();
   }
 }
