@@ -60,16 +60,18 @@ class AppBottomNavigation extends StatelessWidget {
         ),
 
         const NavigationDestination(
+          icon: Icon(Icons.map_outlined),
+          selectedIcon: Icon(Icons.map),
+          label: 'GPS Mapping',
+        ),
+
+        const NavigationDestination(
           icon: Icon(Icons.person_outline),
           selectedIcon: Icon(Icons.person),
           label: 'Profil',
         ),
 
-        const NavigationDestination(
-          icon: Icon(Icons.map_outlined),
-          selectedIcon: Icon(Icons.map),
-          label: 'GPS Mapping',
-        ),
+
       ],
     );
   }
