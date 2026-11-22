@@ -1,1 +1,25 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"agrismart-expiry-test","appId":"1:61538437001:android:dfcd794597ca25d7a88358","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"agrismart-expiry-test","configurations":{"android":"1:61538437001:android:dfcd794597ca25d7a88358","ios":"1:61538437001:ios:3ae8f906a7e9e92ba88358","macos":"1:61538437001:ios:3ae8f906a7e9e92ba88358","web":"1:61538437001:web:5ee3f9e482db809da88358","windows":"1:61538437001:web:833fc4a8793f27bba88358"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "agrismart-iset-22b53",
+          "appId": "1:1044416912850:android:be07f2664e40b1ccfc3c0b",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "agrismart-iset-22b53",
+          "configurations": {
+            "android": "1:1044416912850:android:be07f2664e40b1ccfc3c0b",
+            "ios": "1:1044416912850:ios:1ce2937d1ca52eef951778",
+            "macos": "1:1044416912850:ios:1ce2937d1ca52eef951778",
+            "web": "1:1044416912850:web:111f5cedfa5446a7951778",
+            "windows": "1:1044416912850:web:ea998a20c66314cb951778"
+          }
+        }
+      }
+    }
+  }
+}
