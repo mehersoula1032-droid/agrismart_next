@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/parcel_provider.dart';
-import '../widgets/summary_card.dart';
 import '../widgets/parcel_card.dart';
+import '../widgets/smart_expiry_home_card.dart';
+import '../widgets/summary_card.dart';
 import 'qr_scanner_screen.dart';
 import 'voice_assistant_screen.dart';
 
@@ -115,15 +116,15 @@ class HomeScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(22),
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.wb_sunny_rounded,
                   color: Color(0xFFE5A329),
                   size: 45,
                 ),
-                const SizedBox(width: 14),
-                const Expanded(
+                SizedBox(width: 14),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -136,7 +137,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Text(
+                Text(
                   '30°C',
                   style: TextStyle(
                     fontSize: 24,
@@ -146,6 +147,11 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          // SMART EXPIRY DETECTOR CARD
+          const SmartExpiryHomeCard(),
 
           const SizedBox(height: 24),
 

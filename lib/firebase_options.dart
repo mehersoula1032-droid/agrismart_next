@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBxaOWt5_wBafk_YI1xi8n3ql0JRbXkgEQ',
-    appId: '1:992516007401:web:111f5cedfa5446a7951778',
-    messagingSenderId: '992516007401',
-    projectId: 'agrismart-162d1',
-    authDomain: 'agrismart-162d1.firebaseapp.com',
-    storageBucket: 'agrismart-162d1.firebasestorage.app',
-    measurementId: 'G-TQV6RXJD14',
+    apiKey: 'AIzaSyCvz0GMSeG-z70lWZbQRTJqt8VBg1Sw3zo',
+    appId: '1:61538437001:web:5ee3f9e482db809da88358',
+    messagingSenderId: '61538437001',
+    projectId: 'agrismart-expiry-test',
+    authDomain: 'agrismart-expiry-test.firebaseapp.com',
+    storageBucket: 'agrismart-expiry-test.firebasestorage.app',
+    measurementId: 'G-1M53RTK8RX',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBTaVqqV5NN2JvZU3MFfjBDH1wcBRpkXvE',
-    appId: '1:992516007401:android:61c231867a6409dc951778',
-    messagingSenderId: '992516007401',
-    projectId: 'agrismart-162d1',
-    storageBucket: 'agrismart-162d1.firebasestorage.app',
+    apiKey: 'AIzaSyD2k4x-1Z6QLnD-3qO-m3bkblKQ1DiBKVk',
+    appId: '1:61538437001:android:dfcd794597ca25d7a88358',
+    messagingSenderId: '61538437001',
+    projectId: 'agrismart-expiry-test',
+    storageBucket: 'agrismart-expiry-test.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAArRO9CGAyTGhba2oIPOBvlQye_9biCQg',
-    appId: '1:992516007401:ios:1ce2937d1ca52eef951778',
-    messagingSenderId: '992516007401',
-    projectId: 'agrismart-162d1',
-    storageBucket: 'agrismart-162d1.firebasestorage.app',
+    apiKey: 'AIzaSyAIVSEtL8f43bq55YSPOcBbLvrb3avMRWQ',
+    appId: '1:61538437001:ios:3ae8f906a7e9e92ba88358',
+    messagingSenderId: '61538437001',
+    projectId: 'agrismart-expiry-test',
+    storageBucket: 'agrismart-expiry-test.firebasestorage.app',
     iosBundleId: 'com.example.agrismartNext',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAArRO9CGAyTGhba2oIPOBvlQye_9biCQg',
-    appId: '1:992516007401:ios:1ce2937d1ca52eef951778',
-    messagingSenderId: '992516007401',
-    projectId: 'agrismart-162d1',
-    storageBucket: 'agrismart-162d1.firebasestorage.app',
+    apiKey: 'AIzaSyAIVSEtL8f43bq55YSPOcBbLvrb3avMRWQ',
+    appId: '1:61538437001:ios:3ae8f906a7e9e92ba88358',
+    messagingSenderId: '61538437001',
+    projectId: 'agrismart-expiry-test',
+    storageBucket: 'agrismart-expiry-test.firebasestorage.app',
     iosBundleId: 'com.example.agrismartNext',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBxaOWt5_wBafk_YI1xi8n3ql0JRbXkgEQ',
-    appId: '1:992516007401:web:ea998a20c66314cb951778',
-    messagingSenderId: '992516007401',
-    projectId: 'agrismart-162d1',
-    authDomain: 'agrismart-162d1.firebaseapp.com',
-    storageBucket: 'agrismart-162d1.firebasestorage.app',
-    measurementId: 'G-47H783H266',
+    apiKey: 'AIzaSyCvz0GMSeG-z70lWZbQRTJqt8VBg1Sw3zo',
+    appId: '1:61538437001:web:833fc4a8793f27bba88358',
+    messagingSenderId: '61538437001',
+    projectId: 'agrismart-expiry-test',
+    authDomain: 'agrismart-expiry-test.firebaseapp.com',
+    storageBucket: 'agrismart-expiry-test.firebasestorage.app',
+    measurementId: 'G-1LXEEC22HC',
   );
 }

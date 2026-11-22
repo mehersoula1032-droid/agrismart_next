@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "992516007401",
-    "project_id": "agrismart-162d1",
-    "storage_bucket": "agrismart-162d1.firebasestorage.app"
+    "project_number": "61538437001",
+    "project_id": "agrismart-expiry-test",
+    "storage_bucket": "agrismart-expiry-test.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:992516007401:android:61c231867a6409dc951778",
+        "mobilesdk_app_id": "1:61538437001:android:dfcd794597ca25d7a88358",
         "android_client_info": {
           "package_name": "com.example.agrismart_next"
         }
@@ -15,45 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBTaVqqV5NN2JvZU3MFfjBDH1wcBRpkXvE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:992516007401:android:71f0176935f60f73951778",
-        "android_client_info": {
-          "package_name": "com.example.smart_agriculture"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBTaVqqV5NN2JvZU3MFfjBDH1wcBRpkXvE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:992516007401:android:65ce1abbb31472b0951778",
-        "android_client_info": {
-          "package_name": "com.iset.agrismart"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBTaVqqV5NN2JvZU3MFfjBDH1wcBRpkXvE"
+          "current_key": "AIzaSyD2k4x-1Z6QLnD-3qO-m3bkblKQ1DiBKVk"
         }
       ],
       "services": {
