@@ -1,26 +1,123 @@
 {
   "project_info": {
-    "project_number": "61538437001",
-    "project_id": "agrismart-expiry-test",
-    "storage_bucket": "agrismart-expiry-test.firebasestorage.app"
+    "project_number": "1044416912850",
+    "project_id": "agrismart-iset-22b53",
+    "storage_bucket": "agrismart-iset-22b53.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:61538437001:android:dfcd794597ca25d7a88358",
+        "mobilesdk_app_id": "1:1044416912850:android:be07f2664e40b1ccfc3c0b",
         "android_client_info": {
           "package_name": "com.example.agrismart_next"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD2k4x-1Z6QLnD-3qO-m3bkblKQ1DiBKVk"
+          "current_key": "AIzaSyCaAoB2uZa-Ep-zVRX_l76DBqsfFBeYgP8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044416912850:android:be07f2664e40b1ccfc3c0b",
+        "android_client_info": {
+          "package_name": "com.example.agrismart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAoB2uZa-Ep-zVRX_l76DBqsfFBeYgP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044416912850:android:11afb690ffea15b1fc3c0b",
+        "android_client_info": {
+          "package_name": "com.iset.agrismart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAoB2uZa-Ep-zVRX_l76DBqsfFBeYgP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044416912850:android:11ddda2f35a74864fc3c0b",
+        "android_client_info": {
+          "package_name": "next.agri"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAoB2uZa-Ep-zVRX_l76DBqsfFBeYgP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044416912850-iocu3tsufb6lh7a2p714der9dur6pr12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

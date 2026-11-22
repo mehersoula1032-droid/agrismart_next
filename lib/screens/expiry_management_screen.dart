@@ -310,7 +310,7 @@ class _ExpiryManagementScreenState extends State<ExpiryManagementScreen> {
               return ListView.separated(
                 padding: const EdgeInsets.all(12),
                 itemCount: allItems.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final item = allItems[index];
                   final color = _statusColor(item.status);
