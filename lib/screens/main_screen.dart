@@ -8,7 +8,6 @@ import 'statistics_screen.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
 import 'plant_recognition_screen.dart';
-import 'expiry_management_screen.dart'; // <-- 1. استيراد الشاشة الجديدة
 import '../widgets/app_bottom_navigation.dart';
 
 class MainScreen extends StatefulWidget {
@@ -22,13 +21,12 @@ class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
 
   final List<Widget> pages = const [
-    HomeScreen(),              // 0
-    ZonesScreen(),             // 1
-    StatisticsScreen(),        // 2
-    PlantRecognitionScreen(),  // 3
-    ProfileScreen(),           // 4
-    GPSFarmMappingScreen(),    // 5
-    ExpiryManagementScreen(),  // 6 <-- Smart Expiry Detector
+    HomeScreen(),              // 0: Accueil
+    ZonesScreen(),             // 1: Zones
+    StatisticsScreen(),        // 2: Statistiques
+    PlantRecognitionScreen(),  // 3: Plant Scan
+    GPSFarmMappingScreen(),    // 4: GPS Mapping (Localisation avant Profil)
+    ProfileScreen(),           // 5: Profil
   ];
 
   @override
