@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
@@ -9,6 +11,8 @@ class StatisticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ParcelProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     const greenColor = Color(0xFF99CB92);
 
     final needsIrrigationCount = provider.irrigationCount;
@@ -28,11 +32,11 @@ class StatisticsScreen extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 color: greenColor,
-                child: const Text(
-                  'Statistiques',
-                  style: TextStyle(
+                child: Text(
+                  s.tr('nav_stats'),
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -68,16 +72,16 @@ class StatisticsScreen extends StatelessWidget {
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
-                                    'Météo à Kébili',
-                                    style: TextStyle(
+                                    s.tr('weather_kebili'),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
                                   ),
-                                  SizedBox(height: 8),
-                                  Text(
+                                  const SizedBox(height: 8),
+                                  const Text(
                                     '30 °C',
                                     style: TextStyle(
                                       fontSize: 34,
@@ -90,7 +94,7 @@ class StatisticsScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'Humidité de l\'air : 23 %',
+                                    '${s.tr('air_humidity_label')} : 23 %',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey.shade700,
@@ -98,7 +102,7 @@ class StatisticsScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Vent : 19 km/h',
+                                    '${s.tr('wind_label')} : 19 km/h',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey.shade700,
@@ -111,9 +115,12 @@ class StatisticsScreen extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // 3-day Weather Rows
-                          _weatherForecastRow('Jeu', '15° / 30°', '0.0 mm'),
-                          _weatherForecastRow('Ven', '17° / 26°', '0.0 mm'),
-                          _weatherForecastRow('Sam', '15° / 25°', '0.0 mm'),
+                          _weatherForecastRow(
+                              s.tr('day_thu'), '15° / 30°', '0.0 mm'),
+                          _weatherForecastRow(
+                              s.tr('day_fri'), '17° / 26°', '0.0 mm'),
+                          _weatherForecastRow(
+                              s.tr('day_sat'), '15° / 25°', '0.0 mm'),
 
                           const SizedBox(height: 14),
 
@@ -121,15 +128,15 @@ class StatisticsScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Pas de pluie significative prévue',
-                                style: TextStyle(
+                              Text(
+                                s.tr('no_significant_rain'),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
                               ),
                               Text(
-                                'Mis à jour à 14:35',
+                                s.tr('updated_at_1435'),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Colors.grey.shade500,
@@ -143,7 +150,7 @@ class StatisticsScreen extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // Metric summary card (2 | 2 | 20%)
+                    // Metric summary card
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
@@ -155,18 +162,18 @@ class StatisticsScreen extends StatelessWidget {
                         children: [
                           _StatMetric(
                             value: '$needsIrrigationCount',
-                            label: 'À irriguer',
+                            label: s.tr('to_irrigate'),
                             color: const Color(0xFFE16A45),
                           ),
                           _StatMetric(
                             value: '${provider.healthyCount}',
-                            label: 'Sol correct',
+                            label: s.tr('soil_ok'),
                             color: const Color(0xFF39834D),
                           ),
                           _StatMetric(
                             value:
-                                '${provider.minimumHumidity.toStringAsFixed(0)}%',
-                            label: 'Humidité min',
+                            '${provider.minimumHumidity.toStringAsFixed(0)}%',
+                            label: s.tr('min_humidity'),
                             color: const Color(0xFF3485CC),
                           ),
                         ],
@@ -177,7 +184,7 @@ class StatisticsScreen extends StatelessWidget {
 
                     // Subtitle status
                     Text(
-                      '$needsIrrigationCount zone(s) sur $totalParcels à irriguer ($percentage%)',
+                      '$needsIrrigationCount ${s.tr('zones_to_irrigate_summary')} $totalParcels ${s.tr('to_irrigate_parenthesis')} ($percentage%)',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -187,9 +194,9 @@ class StatisticsScreen extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    const Text(
-                      'Humidité par zone',
-                      style: TextStyle(
+                    Text(
+                      s.tr('humidity_by_zone'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -261,7 +268,7 @@ class StatisticsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SizedBox(
-            width: 50,
+            width: 55,
             child: Text(
               day,
               style: TextStyle(color: Colors.grey.shade800, fontSize: 13),

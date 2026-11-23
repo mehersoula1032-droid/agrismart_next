@@ -4,7 +4,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../models/parcel.dart';
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 import 'parcel_form_screen.dart';
 
 class GPSFarmMappingScreen extends StatefulWidget {
@@ -49,6 +51,7 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
       _selectedParcel = parcel;
     });
 
+    final s = AppStrings.of(context);
     final isNeedIrrigation = parcel.needsIrrigation;
     final statusColor = isNeedIrrigation
         ? const Color(0xFFE16A45)
@@ -115,7 +118,9 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      isNeedIrrigation ? 'À irriguer' : 'Sol OK',
+                      isNeedIrrigation
+                          ? s.tr('to_irrigate')
+                          : s.tr('soil_ok_short'),
                       style: TextStyle(
                         color: statusColor,
                         fontWeight: FontWeight.bold,
@@ -136,21 +141,21 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _DetailStat(
-                      label: 'Humidité',
+                      label: s.tr('humidity_short'),
                       value: '${parcel.humidity.toStringAsFixed(1)}%',
                       icon: Icons.water_drop,
                       color: const Color(0xFF3485CC),
                     ),
                     _DetailStat(
-                      label: 'Seuil',
+                      label: s.tr('threshold_short'),
                       value: '${parcel.threshold.toStringAsFixed(1)}%',
                       icon: Icons.tune,
                       color: Colors.grey.shade700,
                     ),
                     _DetailStat(
-                      label: 'GPS',
+                      label: s.tr('gps_short'),
                       value:
-                          '${parcel.latitude?.toStringAsFixed(3)}, ${parcel.longitude?.toStringAsFixed(3)}',
+                      '${parcel.latitude?.toStringAsFixed(3)}, ${parcel.longitude?.toStringAsFixed(3)}',
                       icon: Icons.map,
                       color: GPSFarmMappingScreen.green,
                     ),
@@ -167,7 +172,7 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
                         _moveToParcel(parcel);
                       },
                       icon: const Icon(Icons.center_focus_strong),
-                      label: const Text('Centrer'),
+                      label: Text(s.tr('center_action')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: GPSFarmMappingScreen.green,
                         side: const BorderSide(
@@ -193,7 +198,7 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
                         );
                       },
                       icon: const Icon(Icons.edit),
-                      label: const Text('Modifier'),
+                      label: Text(s.tr('edit_action')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: GPSFarmMappingScreen.green,
                         foregroundColor: Colors.white,
@@ -216,6 +221,8 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ParcelProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     final parcelsWithGps = provider.parcels
         .where((p) => p.latitude != null && p.longitude != null)
         .toList();
@@ -226,9 +233,9 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Carte & Marqueurs GPS',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          s.tr('gps_map_title'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         foregroundColor: GPSFarmMappingScreen.green,
@@ -236,7 +243,7 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_location_alt),
-            tooltip: 'Ajouter une parcelle avec GPS',
+            tooltip: s.tr('add_parcel_gps_tooltip'),
             onPressed: () {
               Navigator.push(
                 context,
@@ -259,7 +266,7 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
             children: [
               TileLayer(
                 urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.agrismart_next',
               ),
               MarkerLayer(
@@ -391,10 +398,10 @@ class _GPSFarmMappingScreenState extends State<GPSFarmMappingScreen> {
                             color: GPSFarmMappingScreen.green,
                           ),
                           const SizedBox(width: 10),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Aucune parcelle géolocalisée. Ajoutez des coordonnées GPS dans vos parcelles.',
-                              style: TextStyle(fontSize: 12),
+                              s.tr('no_geolocated_parcels'),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ),
                         ],

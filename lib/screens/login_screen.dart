@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/language_provider.dart';
+import '../services/app_strings.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -33,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    final s = AppStrings.of(context);
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = context.read<AuthProvider>();
@@ -58,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         widget.onLoginSuccess!();
       }
     } else {
-      final error = authProvider.errorMessage ?? 'Une erreur est survenue';
+      final error = authProvider.errorMessage ?? s.tr('generic_error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error),
@@ -69,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showForgotPasswordDialog() {
+    final s = AppStrings.of(context);
     final resetEmailController = TextEditingController(
       text: _emailController.text,
     );
@@ -79,9 +83,9 @@ class _LoginScreenState extends State<LoginScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Réinitialisation du mot de passe',
-          style: TextStyle(
+        title: Text(
+          s.tr('reset_password_title'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color(0xFF276738),
@@ -91,16 +95,16 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Entrez votre adresse email pour recevoir un lien de réinitialisation.',
-              style: TextStyle(fontSize: 14),
+            Text(
+              s.tr('reset_password_desc'),
+              style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: resetEmailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: 'Email',
+                labelText: s.tr('email'),
                 prefixIcon: const Icon(Icons.email_outlined),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -119,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(s.tr('cancel')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -144,9 +148,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 SnackBar(
                   content: Text(
                     success
-                        ? 'Email de réinitialisation envoyé'
+                        ? s.tr('reset_email_sent')
                         : (authProvider.errorMessage ??
-                            'Erreur d\'envoi de l\'email'),
+                        s.tr('reset_email_error')),
                   ),
                   backgroundColor: success
                       ? const Color(0xFF2B362B)
@@ -159,7 +163,55 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
             },
-            child: const Text('Envoyer'),
+            child: Text(s.tr('send')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context, Color green) {
+    final langProvider = context.watch<LanguageProvider>();
+    final currentLang = langProvider.languageCode;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.language, size: 20, color: Color(0xFF276738)),
+          const SizedBox(width: 8),
+          SegmentedButton<String>(
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: green,
+              selectedForegroundColor: Colors.white,
+              foregroundColor: const Color(0xFF1B4332),
+              visualDensity: VisualDensity.compact,
+            ),
+            segments: const [
+              ButtonSegment<String>(
+                value: 'ar',
+                label: Text('العربية'),
+              ),
+              ButtonSegment<String>(
+                value: 'fr',
+                label: Text('FR'),
+              ),
+              ButtonSegment<String>(
+                value: 'en',
+                label: Text('EN'),
+              ),
+            ],
+            selected: <String>{currentLang},
+            onSelectionChanged: (Set<String> newSelection) {
+              langProvider.setLanguage(newSelection.first);
+            },
           ),
         ],
       ),
@@ -169,6 +221,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     const green = Color(0xFF276738);
 
     return Scaffold(
@@ -182,7 +236,12 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+
+                  // Sélecteur de langue (AR / FR / EN)
+                  _buildLanguageSelector(context, green),
+
+                  const SizedBox(height: 24),
 
                   // Tractor Logo Icon
                   Container(
@@ -201,9 +260,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 20),
 
-                  const Text(
-                    'AgriSmart',
-                    style: TextStyle(
+                  Text(
+                    s.tr('app_name'),
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1B4332),
@@ -217,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: 'Nom de l\'exploitation',
+                        labelText: s.tr('farm_name'),
                         prefixIcon: const Icon(Icons.person_outline),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -237,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fillColor: Colors.white,
                       ),
                       validator: (v) => v == null || v.trim().isEmpty
-                          ? 'Veuillez saisir votre nom'
+                          ? s.tr('enter_name')
                           : null,
                     ),
                     const SizedBox(height: 16),
@@ -248,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: s.tr('email'),
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -269,9 +328,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'Veuillez saisir votre email';
+                        return s.tr('enter_email');
                       }
-                      if (!v.contains('@')) return 'Email invalide';
+                      if (!v.contains('@')) return s.tr('invalid_email');
                       return null;
                     },
                   ),
@@ -283,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     obscureText: _isObscure,
                     decoration: InputDecoration(
-                      labelText: 'Mot de passe',
+                      labelText: s.tr('password'),
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -316,9 +375,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'Veuillez saisir votre mot de passe';
+                        return s.tr('enter_password');
                       }
-                      if (v.length < 4) return 'Mot de passe trop court';
+                      if (v.length < 4) return s.tr('short_password');
                       return null;
                     },
                   ),
@@ -341,20 +400,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: authProvider.isLoading
                           ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.5,
-                              ),
-                            )
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
+                      )
                           : Text(
-                              _isSignUp ? 'S\'inscrire' : 'Se connecter',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        _isSignUp
+                            ? s.tr('signup_title')
+                            : s.tr('login_title'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
 
@@ -364,9 +425,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (!_isSignUp)
                     TextButton(
                       onPressed: _showForgotPasswordDialog,
-                      child: const Text(
-                        'Mot de passe oublié ?',
-                        style: TextStyle(
+                      child: Text(
+                        s.tr('forgot_password'),
+                        style: const TextStyle(
                           color: green,
                           fontWeight: FontWeight.w600,
                         ),
@@ -387,12 +448,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: RichText(
                         text: TextSpan(
                           text: _isSignUp
-                              ? 'Déjà un compte ? '
-                              : 'Pas de compte ? ',
+                              ? s.tr('already_have_account')
+                              : s.tr('no_account'),
                           style: TextStyle(color: Colors.grey.shade700),
                           children: [
                             TextSpan(
-                              text: _isSignUp ? 'Se connecter' : 'S\'inscrire',
+                              text: _isSignUp
+                                  ? s.tr('login_title')
+                                  : s.tr('signup_title'),
                               style: const TextStyle(
                                 color: green,
                                 fontWeight: FontWeight.bold,

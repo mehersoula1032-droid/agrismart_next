@@ -1,20 +1,21 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/language_provider.dart';
+import '../services/app_strings.dart';
 
 class PlantRecognitionScreen extends StatefulWidget {
   const PlantRecognitionScreen({super.key});
 
   @override
-  State<PlantRecognitionScreen> createState() =>
-      _PlantRecognitionScreenState();
+  State<PlantRecognitionScreen> createState() => _PlantRecognitionScreenState();
 }
 
-class _PlantRecognitionScreenState
-    extends State<PlantRecognitionScreen> {
+class _PlantRecognitionScreenState extends State<PlantRecognitionScreen> {
   final ImagePicker _picker = ImagePicker();
 
   File? selectedImage;
@@ -31,6 +32,7 @@ class _PlantRecognitionScreenState
 
   // Camera and Gallery
   Future<void> selectImage(ImageSource source) async {
+    final s = AppStrings.of(context);
     try {
       final XFile? image = await _picker.pickImage(
         source: source,
@@ -56,7 +58,7 @@ class _PlantRecognitionScreenState
         isLoading = false;
 
         if (results.isEmpty) {
-          errorMessage = 'Aucun résultat trouvé.';
+          errorMessage = s.tr('no_result_found');
         }
       });
     } catch (e) {
@@ -64,7 +66,7 @@ class _PlantRecognitionScreenState
 
       setState(() {
         isLoading = false;
-        errorMessage = 'Erreur lors de l’analyse de l’image.';
+        errorMessage = s.tr('image_analysis_error');
       });
     }
   }
@@ -77,41 +79,38 @@ class _PlantRecognitionScreenState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Plant Recognition',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          s.tr('plant_recognition_title'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Analysez votre plante',
-              style: TextStyle(
+            Text(
+              s.tr('analyze_plant_heading'),
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF276738),
               ),
             ),
-
             const SizedBox(height: 8),
-
-            const Text(
-              'Prenez une photo ou choisissez une image '
-                  'pour analyser votre plante.',
-              style: TextStyle(
+            Text(
+              s.tr('analyze_plant_subtitle'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
               ),
             ),
-
             const SizedBox(height: 24),
 
             // Image Preview
@@ -121,18 +120,17 @@ class _PlantRecognitionScreenState
                 color: const Color(0xFFEAF2E8),
                 borderRadius: BorderRadius.circular(18),
               ),
-
               child: selectedImage == null
-                  ? const Column(
+                  ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.eco,
                     size: 65,
                     color: Color(0xFF276738),
                   ),
-                  SizedBox(height: 12),
-                  Text('Aucune image sélectionnée'),
+                  const SizedBox(height: 12),
+                  Text(s.tr('no_image_selected')),
                 ],
               )
                   : ClipRRect(
@@ -152,11 +150,10 @@ class _PlantRecognitionScreenState
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: isLoading
-                        ? null
-                        : () => selectImage(ImageSource.camera),
+                    onPressed:
+                    isLoading ? null : () => selectImage(ImageSource.camera),
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('Caméra'),
+                    label: Text(s.tr('camera')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF276738),
                       foregroundColor: Colors.white,
@@ -166,16 +163,14 @@ class _PlantRecognitionScreenState
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: isLoading
                         ? null
                         : () => selectImage(ImageSource.gallery),
                     icon: const Icon(Icons.photo_library),
-                    label: const Text('Galerie'),
+                    label: Text(s.tr('gallery')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFDDEBDD),
                       foregroundColor: const Color(0xFF276738),
@@ -192,13 +187,13 @@ class _PlantRecognitionScreenState
 
             // Loading
             if (isLoading)
-              const Column(
+              Column(
                 children: [
-                  CircularProgressIndicator(
+                  const CircularProgressIndicator(
                     color: Color(0xFF276738),
                   ),
-                  SizedBox(height: 12),
-                  Text('Analyse de votre image...'),
+                  const SizedBox(height: 12),
+                  Text(s.tr('analyzing_image')),
                 ],
               ),
 
@@ -214,17 +209,15 @@ class _PlantRecognitionScreenState
 
             // Results
             if (labels.isNotEmpty) ...[
-              const Text(
-                'Résultats de l’analyse',
-                style: TextStyle(
+              Text(
+                s.tr('analysis_results'),
+                style: const TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF276738),
                 ),
               ),
-
               const SizedBox(height: 12),
-
               ...labels.map(
                     (label) => Card(
                   child: ListTile(
@@ -232,16 +225,14 @@ class _PlantRecognitionScreenState
                       Icons.eco,
                       color: Color(0xFF276738),
                     ),
-
                     title: Text(
                       label.label,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     subtitle: Text(
-                      'Confiance : '
+                      '${s.tr('confidence_label')} : '
                           '${(label.confidence * 100).toStringAsFixed(1)}%',
                     ),
                   ),
@@ -251,11 +242,9 @@ class _PlantRecognitionScreenState
 
             const SizedBox(height: 15),
 
-            const Text(
-              'Remarque : cette analyse identifie des éléments '
-                  'généraux dans l’image. Elle ne permet pas de '
-                  'diagnostiquer les maladies des plantes.',
-              style: TextStyle(
+            Text(
+              s.tr('plant_disclaimer_note'),
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),

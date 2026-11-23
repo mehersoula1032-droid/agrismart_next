@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 import '../widgets/parcel_card.dart';
 import 'parcel_form_screen.dart';
 
@@ -11,6 +13,8 @@ class ZonesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ParcelProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     const darkGreen = Color(0xFF276738);
 
     return Scaffold(
@@ -42,9 +46,9 @@ class ZonesScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'AgriSmart',
-                    style: TextStyle(
+                  Text(
+                    s.tr('app_name'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -60,7 +64,7 @@ class ZonesScreen extends StatelessWidget {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      'Humidité moyenne : ${provider.averageHumidity.toStringAsFixed(1)}%',
+                      '${s.tr('avg_humidity_label')} : ${provider.averageHumidity.toStringAsFixed(1)}%',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -72,7 +76,7 @@ class ZonesScreen extends StatelessWidget {
               ),
             ),
 
-            // Top Summary Metrics bar (2 À irriguer | 2 Sol correct | 20% Humidité min)
+            // Top Summary Metrics bar
             Container(
               color: const Color(0xFFF5F7F1),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -81,18 +85,17 @@ class ZonesScreen extends StatelessWidget {
                 children: [
                   _MetricItem(
                     value: '${provider.irrigationCount}',
-                    label: 'À irriguer',
+                    label: s.tr('to_irrigate'),
                     color: const Color(0xFFE16A45),
                   ),
                   _MetricItem(
                     value: '${provider.healthyCount}',
-                    label: 'Sol correct',
+                    label: s.tr('soil_ok'),
                     color: const Color(0xFF39834D),
                   ),
                   _MetricItem(
-                    value:
-                        '${provider.minimumHumidity.toStringAsFixed(0)}%',
-                    label: 'Humidité min',
+                    value: '${provider.minimumHumidity.toStringAsFixed(0)}%',
+                    label: s.tr('min_humidity'),
                     color: const Color(0xFF3485CC),
                   ),
                 ],
@@ -104,15 +107,15 @@ class ZonesScreen extends StatelessWidget {
             // Main List of Zones / Parcels
             Expanded(
               child: provider.parcels.isEmpty
-                  ? _emptyState(context)
+                  ? _emptyState(context, s)
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: provider.parcels.length,
-                      itemBuilder: (context, index) {
-                        final parcel = provider.parcels[index];
-                        return ParcelCard(parcel: parcel);
-                      },
-                    ),
+                padding: const EdgeInsets.all(16),
+                itemCount: provider.parcels.length,
+                itemBuilder: (context, index) {
+                  final parcel = provider.parcels[index];
+                  return ParcelCard(parcel: parcel);
+                },
+              ),
             ),
           ],
         ),
@@ -120,7 +123,7 @@ class ZonesScreen extends StatelessWidget {
     );
   }
 
-  Widget _emptyState(BuildContext context) {
+  Widget _emptyState(BuildContext context, AppStrings s) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(25),
@@ -133,13 +136,13 @@ class ZonesScreen extends StatelessWidget {
               color: Color(0xFF276738),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Aucune parcelle enregistrée',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              s.tr('no_parcels_registered'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Appuyez sur le bouton + pour ajouter une nouvelle zone.',
+              s.tr('add_parcel_hint'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey.shade600),
             ),

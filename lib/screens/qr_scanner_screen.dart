@@ -1,8 +1,11 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -30,7 +33,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     super.dispose();
   }
 
-  void _simulateScan(BuildContext context) {
+  void _simulateScan(BuildContext context, AppStrings s) {
     setState(() {
       _isScanning = true;
     });
@@ -45,16 +48,18 @@ class _QrScannerScreenState extends State<QrScannerScreen>
         final randomParcel = parcels[Random().nextInt(parcels.length)];
         setState(() {
           _scanResult =
-              'Capteur #${randomParcel.id}\nZone: ${randomParcel.name}\nHumidité mesurée: ${randomParcel.humidity.toStringAsFixed(1)}%';
+          '${s.tr('sensor_prefix')} #${randomParcel.id}\n'
+              '${s.tr('zone_label')}: ${randomParcel.name}\n'
+              '${s.tr('measured_humidity_label')}: ${randomParcel.humidity.toStringAsFixed(1)}%';
           _isScanning = false;
         });
 
         if (mounted && context.mounted) {
-          _showScanDialog(context, randomParcel.name, randomParcel.humidity);
+          _showScanDialog(context, randomParcel.name, randomParcel.humidity, s);
         }
       } else {
         setState(() {
-          _scanResult = 'Aucun capteur détecté';
+          _scanResult = s.tr('no_sensor_detected');
           _isScanning = false;
         });
       }
@@ -62,18 +67,22 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   }
 
   void _showScanDialog(
-      BuildContext context, String name, double humidity) {
+      BuildContext context,
+      String name,
+      double humidity,
+      AppStrings s,
+      ) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.qr_code_2, color: Color(0xFF276738)),
-            SizedBox(width: 10),
-            Text('Capteur Détecté'),
+            const Icon(Icons.qr_code_2, color: Color(0xFF276738)),
+            const SizedBox(width: 10),
+            Text(s.tr('sensor_detected_title')),
           ],
         ),
         content: Column(
@@ -81,12 +90,12 @@ class _QrScannerScreenState extends State<QrScannerScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Parcelle : $name',
+              '${s.tr('parcel_colon_label')} : $name',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'Humidité transmise : ${humidity.toStringAsFixed(1)}%',
+              '${s.tr('transmitted_humidity_label')} : ${humidity.toStringAsFixed(1)}%',
               style: const TextStyle(fontSize: 14),
             ),
           ],
@@ -94,7 +103,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Fermer'),
+            child: Text(s.tr('close')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -108,13 +117,13 @@ class _QrScannerScreenState extends State<QrScannerScreen>
               Navigator.pop(dialogContext);
               if (mounted && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Données du capteur synchronisées !'),
+                  SnackBar(
+                    content: Text(s.tr('sensor_data_synced')),
                   ),
                 );
               }
             },
-            child: const Text('Synchroniser'),
+            child: Text(s.tr('synchronize_btn')),
           ),
         ],
       ),
@@ -125,24 +134,26 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   Widget build(BuildContext context) {
     const darkGreen = Color(0xFF276738);
     final provider = context.watch<ParcelProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F1),
       appBar: AppBar(
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
-        title: const Text(
-          'Scanner & Générateur QR',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          s.tr('qr_screen_title'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(icon: Icon(Icons.qr_code_scanner), text: 'Scanner'),
-            Tab(icon: Icon(Icons.qr_code), text: 'Mon QR Code'),
+          tabs: [
+            Tab(icon: const Icon(Icons.qr_code_scanner), text: s.tr('tab_scanner')),
+            Tab(icon: const Icon(Icons.qr_code), text: s.tr('tab_my_qr')),
           ],
         ),
       ),
@@ -155,12 +166,11 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Placez le QR code du capteur au centre du cadre',
+                Text(
+                  s.tr('place_qr_in_frame'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                 ),
-
                 const SizedBox(height: 30),
 
                 // Scanner Viewport
@@ -203,9 +213,9 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                 const SizedBox(height: 30),
 
                 ElevatedButton.icon(
-                  onPressed: () => _simulateScan(context),
+                  onPressed: () => _simulateScan(context, s),
                   icon: const Icon(Icons.camera_alt),
-                  label: const Text('Scanner le Capteur'),
+                  label: Text(s.tr('scan_sensor_btn')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: darkGreen,
                     foregroundColor: Colors.white,
@@ -243,19 +253,19 @@ class _QrScannerScreenState extends State<QrScannerScreen>
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                const Text(
-                  'Générer un QR Code pour vos parcelles',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Text(
+                  s.tr('generate_qr_heading'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
 
                 if (provider.parcels.isNotEmpty) ...[
                   DropdownButtonFormField<String>(
-                    initialValue: provider.parcels.any((p) => p.id == _selectedParcelId)
+                    value: provider.parcels.any((p) => p.id == _selectedParcelId)
                         ? _selectedParcelId
                         : provider.parcels.first.id,
                     decoration: InputDecoration(
-                      labelText: 'Sélectionner une parcelle',
+                      labelText: s.tr('select_parcel_label'),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -299,7 +309,8 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                         width: 200,
                         height: 200,
                         child: CustomPaint(
-                          painter: QrPainter(data: 'AGRISMART_PARCEL_$_selectedParcelId'),
+                          painter: QrPainter(
+                              data: 'AGRISMART_PARCEL_$_selectedParcelId'),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -319,13 +330,13 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                 ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('QR Code prêt à être imprimé ou partagé'),
+                      SnackBar(
+                        content: Text(s.tr('qr_ready_to_share')),
                       ),
                     );
                   },
                   icon: const Icon(Icons.share),
-                  label: const Text('Partager le QR Code'),
+                  label: Text(s.tr('share_qr_btn')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: darkGreen,
                     foregroundColor: Colors.white,
@@ -366,8 +377,13 @@ class QrPainter extends CustomPainter {
         if ((r < 4 && c < 4) ||
             (r < 4 && c >= 11) ||
             (r >= 11 && c < 4)) {
-          if (r == 0 || r == 3 || c == 0 || c == 3 ||
-              r == 14 || c == 14 || (r >= 11 && (r == 11 || c == 0 || c == 3))) {
+          if (r == 0 ||
+              r == 3 ||
+              c == 0 ||
+              c == 3 ||
+              r == 14 ||
+              c == 14 ||
+              (r >= 11 && (r == 11 || c == 0 || c == 3))) {
             canvas.drawRect(
               Rect.fromLTWH(c * cellWidth, r * cellHeight, cellWidth, cellHeight),
               paint,

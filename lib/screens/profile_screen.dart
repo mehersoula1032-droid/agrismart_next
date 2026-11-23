@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,6 +13,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final parcelProvider = context.watch<ParcelProvider>();
     final authProvider = context.watch<AuthProvider>();
+    final langProvider = context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     const darkGreen = Color(0xFF276738);
 
     return Scaffold(
@@ -23,9 +27,9 @@ class ProfileScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               color: darkGreen,
-              child: const Text(
-                'Profil',
-                style: TextStyle(
+              child: Text(
+                s.tr('nav_profile'),
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -88,12 +92,49 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           ListTile(
                             leading: const Icon(
+                              Icons.language,
+                              color: darkGreen,
+                            ),
+                            title: Text(
+                              s.tr('choose_language'),
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            trailing: SegmentedButton<String>(
+                              style: SegmentedButton.styleFrom(
+                                selectedBackgroundColor: darkGreen,
+                                selectedForegroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF1B4332),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              segments: const [
+                                ButtonSegment<String>(
+                                  value: 'ar',
+                                  label: Text('العربية'),
+                                ),
+                                ButtonSegment<String>(
+                                  value: 'fr',
+                                  label: Text('FR'),
+                                ),
+                                ButtonSegment<String>(
+                                  value: 'en',
+                                  label: Text('EN'),
+                                ),
+                              ],
+                              selected: <String>{langProvider.languageCode},
+                              onSelectionChanged: (Set<String> newSelection) {
+                                langProvider.setLanguage(newSelection.first);
+                              },
+                            ),
+                          ),
+                          const Divider(height: 1, indent: 16, endIndent: 16),
+                          ListTile(
+                            leading: const Icon(
                               Icons.grass,
                               color: darkGreen,
                             ),
-                            title: const Text(
-                              'Zones suivies',
-                              style: TextStyle(fontWeight: FontWeight.w500),
+                            title: Text(
+                              s.tr('tracked_zones'),
+                              style: const TextStyle(fontWeight: FontWeight.w500),
                             ),
                             trailing: Text(
                               '${parcelProvider.totalParcels}',
@@ -109,13 +150,13 @@ class ProfileScreen extends StatelessWidget {
                               Icons.info_outline,
                               color: darkGreen,
                             ),
-                            title: const Text(
-                              'À propos',
-                              style: TextStyle(fontWeight: FontWeight.w500),
+                            title: Text(
+                              s.tr('about'),
+                              style: const TextStyle(fontWeight: FontWeight.w500),
                             ),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () {
-                              _showAboutDialog(context);
+                              _showAboutDialog(context, s);
                             },
                           ),
                           const Divider(height: 1, indent: 16, endIndent: 16),
@@ -124,15 +165,15 @@ class ProfileScreen extends StatelessWidget {
                               Icons.logout,
                               color: Colors.red,
                             ),
-                            title: const Text(
-                              'Se déconnecter',
-                              style: TextStyle(
+                            title: Text(
+                              s.tr('logout'),
+                              style: const TextStyle(
                                 color: Colors.red,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             onTap: () {
-                              _confirmSignOut(context, authProvider);
+                              _confirmSignOut(context, authProvider, s);
                             },
                           ),
                         ],
@@ -148,7 +189,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showAboutDialog(BuildContext context) {
+  void _showAboutDialog(BuildContext context, AppStrings s) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -156,40 +197,44 @@ class ProfileScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         title: Row(
-          children: const [
-            Icon(Icons.agriculture, color: Color(0xFF276738)),
-            SizedBox(width: 10),
-            Text('AgriSmart Next'),
+          children: [
+            const Icon(Icons.agriculture, color: Color(0xFF276738)),
+            const SizedBox(width: 10),
+            Text(s.tr('app_name')),
           ],
         ),
-        content: const Text(
-          'AgriSmart Next est votre assistant d\'agriculture intelligente pour surveiller l\'humidité des sols, gérer vos parcelles et optimiser vos irrigations.\n\nVersion 1.0.0',
+        content: Text(
+          s.tr('about_description'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Fermer'),
+            child: Text(s.tr('close')),
           ),
         ],
       ),
     );
   }
 
-  void _confirmSignOut(BuildContext context, AuthProvider authProvider) {
+  void _confirmSignOut(
+      BuildContext context,
+      AuthProvider authProvider,
+      AppStrings s,
+      ) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text('Déconnexion'),
-        content: const Text(
-          'Voulez-vous vraiment vous déconnecter d\'AgriSmart ?',
+        title: Text(s.tr('logout_title')),
+        content: Text(
+          s.tr('logout_confirm_msg'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(s.tr('cancel')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -203,7 +248,7 @@ class ProfileScreen extends StatelessWidget {
               Navigator.pop(dialogContext);
               await authProvider.signOut();
             },
-            child: const Text('Se déconnecter'),
+            child: Text(s.tr('logout')),
           ),
         ],
       ),

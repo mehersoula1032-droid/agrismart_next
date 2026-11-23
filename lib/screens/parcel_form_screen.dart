@@ -1,8 +1,10 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/parcel.dart';
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 
 class ParcelFormScreen extends StatefulWidget {
   final Parcel? parcel;
@@ -68,35 +70,35 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     super.dispose();
   }
 
-  String? _validateText(String? value) {
+  String? _validateText(String? value, AppStrings s) {
     if (value == null || value.trim().isEmpty) {
-      return 'Ce champ est obligatoire';
+      return s.tr('required_field');
     }
     return null;
   }
 
-  String? _validateNumber(String? value) {
+  String? _validateNumber(String? value, AppStrings s) {
     if (value == null || value.trim().isEmpty) {
-      return 'Ce champ est obligatoire';
+      return s.tr('required_field');
     }
 
     final number = double.tryParse(value.replaceAll(',', '.'));
 
     if (number == null || number < 0) {
-      return 'Entrez un nombre valide';
+      return s.tr('invalid_number');
     }
 
     return null;
   }
 
-  String? _validateCoordinate(String? value) {
+  String? _validateCoordinate(String? value, AppStrings s) {
     if (value == null || value.trim().isEmpty) {
       return null; // optionnel
     }
 
     final number = double.tryParse(value.replaceAll(',', '.'));
     if (number == null) {
-      return 'Coordonnée invalide';
+      return s.tr('invalid_coordinate');
     }
 
     return null;
@@ -149,7 +151,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     });
   }
 
-  void _saveParcel() {
+  void _saveParcel(AppStrings s) {
     if (!_formKey.currentState!.validate()) return;
 
     final provider = context.read<ParcelProvider>();
@@ -183,8 +185,8 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       SnackBar(
         content: Text(
           isEditing
-              ? 'Parcelle modifiée avec succès'
-              : 'Parcelle ajoutée avec succès',
+              ? s.tr('parcel_updated_success')
+              : s.tr('parcel_added_success'),
         ),
         backgroundColor: const Color(0xFF2E7D32),
       ),
@@ -195,6 +197,8 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     const green = Color(0xFF2E7D32);
 
     return Scaffold(
@@ -207,7 +211,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isEditing ? 'Modifier la parcelle' : 'Nouvelle parcelle',
+          isEditing ? s.tr('edit_parcel_title') : s.tr('new_parcel_title'),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Color(0xFF1B4332),
@@ -228,91 +232,79 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                   color: green,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.agriculture,
                       color: Colors.white,
                       size: 36,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
-                      'Gestion de votre parcelle',
-                      style: TextStyle(
+                      s.tr('parcel_management_heading'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
-                      'Complétez les informations de votre terrain.',
-                      style: TextStyle(color: Colors.white70),
+                      s.tr('parcel_form_subtitle'),
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 28),
-
-              const Text(
-                'Informations générales',
-                style: TextStyle(
+              Text(
+                s.tr('general_info'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Nom de la parcelle',
+                label: s.tr('parcel_name_label'),
                 controller: _nameController,
                 icon: Icons.landscape,
-                hint: 'Ex: Parcelle Nord',
-                validator: _validateText,
+                hint: s.tr('parcel_name_hint'),
+                validator: (v) => _validateText(v, s),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Type de culture',
+                label: s.tr('crop_type_label'),
                 controller: _cropController,
                 icon: Icons.eco,
-                hint: 'Ex: Olivier, Tomate...',
-                validator: _validateText,
+                hint: s.tr('crop_type_hint'),
+                validator: (v) => _validateText(v, s),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Surface',
+                label: s.tr('area_label'),
                 controller: _areaController,
                 icon: Icons.square_foot,
                 suffix: 'ha',
                 isNumeric: true,
-                validator: _validateNumber,
+                validator: (v) => _validateNumber(v, s),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Localisation',
+                label: s.tr('location_label'),
                 controller: _locationController,
                 icon: Icons.location_on_outlined,
-                hint: 'Ex: Kébili',
-                validator: _validateText,
+                hint: s.tr('location_hint'),
+                validator: (v) => _validateText(v, s),
               ),
-
               const SizedBox(height: 28),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Position GPS (Marqueur carte)',
-                    style: TextStyle(
+                  Text(
+                    s.tr('gps_position_heading'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -320,88 +312,78 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                   TextButton.icon(
                     onPressed: _setDefaultGpsCoordinates,
                     icon: const Icon(Icons.my_location, size: 18, color: green),
-                    label: const Text(
-                      'Ex. Kébili',
-                      style: TextStyle(color: green, fontSize: 13),
+                    label: Text(
+                      s.tr('ex_kebili'),
+                      style: const TextStyle(color: green, fontSize: 13),
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 12),
-
               Row(
                 children: [
                   Expanded(
                     child: _buildField(
-                      label: 'Latitude',
+                      label: s.tr('latitude_label'),
                       controller: _latController,
                       icon: Icons.map,
                       hint: 'Ex: 33.7050',
                       isNumeric: true,
-                      validator: _validateCoordinate,
+                      validator: (v) => _validateCoordinate(v, s),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildField(
-                      label: 'Longitude',
+                      label: s.tr('longitude_label'),
                       controller: _lngController,
                       icon: Icons.map_outlined,
                       hint: 'Ex: 8.9650',
                       isNumeric: true,
-                      validator: _validateCoordinate,
+                      validator: (v) => _validateCoordinate(v, s),
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 28),
-
-              const Text(
-                'Données d’irrigation',
-                style: TextStyle(
+              Text(
+                s.tr('irrigation_data_heading'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Humidité actuelle',
+                label: s.tr('current_humidity_label'),
                 controller: _humidityController,
                 icon: Icons.water_drop,
                 suffix: '%',
                 isNumeric: true,
-                validator: _validateNumber,
+                validator: (v) => _validateNumber(v, s),
               ),
-
               const SizedBox(height: 16),
-
               _buildField(
-                label: 'Seuil d’irrigation',
+                label: s.tr('irrigation_threshold_label'),
                 controller: _thresholdController,
                 icon: Icons.tune,
                 suffix: '%',
                 isNumeric: true,
-                validator: _validateNumber,
+                validator: (v) => _validateNumber(v, s),
               ),
-
               const SizedBox(height: 30),
-
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: _saveParcel,
+                  onPressed: () => _saveParcel(s),
                   icon: Icon(
                     isEditing ? Icons.save : Icons.add,
                   ),
                   label: Text(
                     isEditing
-                        ? 'Enregistrer les modifications'
-                        : 'Ajouter la parcelle',
+                        ? s.tr('save_changes_btn')
+                        : s.tr('add_parcel_btn'),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -416,7 +398,6 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),

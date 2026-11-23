@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 import '../widgets/parcel_card.dart';
 import '../widgets/smart_expiry_home_card.dart';
 import '../widgets/summary_card.dart';
@@ -14,6 +16,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ParcelProvider>();
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
 
     return SafeArea(
       child: ListView(
@@ -26,16 +30,16 @@ class HomeScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'AgriSmart',
-                    style: TextStyle(
+                  Text(
+                    s.tr('app_name'),
+                    style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF276738),
                     ),
                   ),
                   Text(
-                    'Votre exploitation intelligente',
+                    s.tr('smart_farm_subtitle'),
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                 ],
@@ -87,21 +91,21 @@ class HomeScreen extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bonjour 👋',
-                  style: TextStyle(
+                  s.tr('hello_wave'),
+                  style: const TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Prenez soin de vos cultures avec AgriSmart.',
-                  style: TextStyle(color: Colors.white),
+                  s.tr('welcome_crops_msg'),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -116,28 +120,28 @@ class HomeScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(22),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.wb_sunny_rounded,
                   color: Color(0xFFE5A329),
                   size: 45,
                 ),
-                SizedBox(width: 14),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Météo à Kébili',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        s.tr('weather_kebili'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 4),
-                      Text('Soleil • Pas de pluie prévue'),
+                      const SizedBox(height: 4),
+                      Text(s.tr('weather_sunny_no_rain')),
                     ],
                   ),
                 ),
-                Text(
+                const Text(
                   '30°C',
                   style: TextStyle(
                     fontSize: 24,
@@ -156,9 +160,9 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // SUMMARY
-          const Text(
-            'Vue d’ensemble',
-            style: TextStyle(
+          Text(
+            s.tr('overview_title'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -170,9 +174,9 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: SummaryCard(
-                  title: 'Parcelles',
+                  title: s.tr('parcels_title'),
                   value: '${provider.totalParcels}',
-                  subtitle: 'Zones suivies',
+                  subtitle: s.tr('tracked_zones'),
                   icon: Icons.landscape_outlined,
                   color: const Color(0xFF39834D),
                 ),
@@ -180,9 +184,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: SummaryCard(
-                  title: 'À irriguer',
+                  title: s.tr('to_irrigate'),
                   value: '${provider.irrigationCount}',
-                  subtitle: 'Sous le seuil',
+                  subtitle: s.tr('below_threshold'),
                   icon: Icons.water_drop_outlined,
                   color: const Color(0xFFE16A45),
                 ),
@@ -196,9 +200,9 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: SummaryCard(
-                  title: 'Humidité moy.',
+                  title: s.tr('avg_humidity'),
                   value: '${provider.averageHumidity.toStringAsFixed(1)}%',
-                  subtitle: 'Toutes les parcelles',
+                  subtitle: s.tr('all_parcels'),
                   icon: Icons.opacity,
                   color: const Color(0xFF3485CC),
                 ),
@@ -206,9 +210,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: SummaryCard(
-                  title: 'Sol correct',
+                  title: s.tr('soil_ok'),
                   value: '${provider.healthyCount}',
-                  subtitle: 'Au-dessus du seuil',
+                  subtitle: s.tr('above_threshold'),
                   icon: Icons.check_circle_outline,
                   color: const Color(0xFF39834D),
                 ),
@@ -222,15 +226,15 @@ class HomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Mes parcelles',
-                style: TextStyle(
+              Text(
+                s.tr('my_parcels'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '${provider.totalParcels} zones',
+                '${provider.totalParcels} ${s.tr('zones_count')}',
                 style: TextStyle(color: Colors.grey.shade600),
               ),
             ],
@@ -245,9 +249,9 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           // QUICK ACTIONS
-          const Text(
-            'Accès rapide',
-            style: TextStyle(
+          Text(
+            s.tr('quick_access'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -260,7 +264,7 @@ class HomeScreen extends StatelessWidget {
               Expanded(
                 child: _QuickAction(
                   icon: Icons.qr_code_scanner,
-                  title: 'Scanner QR',
+                  title: s.tr('scan_qr'),
                   color: const Color(0xFF276738),
                   onTap: () {
                     Navigator.push(
@@ -276,7 +280,7 @@ class HomeScreen extends StatelessWidget {
               Expanded(
                 child: _QuickAction(
                   icon: Icons.mic_none,
-                  title: 'Assistant IA',
+                  title: s.tr('ai_assistant'),
                   color: const Color(0xFF3485CC),
                   onTap: () {
                     Navigator.push(

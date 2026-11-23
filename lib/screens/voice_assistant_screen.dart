@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../services/app_strings.dart';
 
 class ChatMessage {
   final String text;
@@ -28,6 +30,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   final List<ChatMessage> _messages = [];
   final TextEditingController _textController = TextEditingController();
   bool _isListening = false;
+  bool _initializedGreeting = false;
 
   @override
   void initState() {
@@ -36,14 +39,21 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
+  }
 
-    _messages.add(
-      ChatMessage(
-        text:
-            'Bonjour ! Je suis votre assistant intelligent AgriSmart 🌾. Posez-moi vos questions sur vos parcelles, l\'irrigation, la météo ou le fonctionnement de l\'application !',
-        isUser: false,
-      ),
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedGreeting) {
+      _initializedGreeting = true;
+      final s = AppStrings.of(context);
+      _messages.add(
+        ChatMessage(
+          text: s.tr('voice_greeting'),
+          isUser: false,
+        ),
+      );
+    }
   }
 
   @override
@@ -53,7 +63,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     super.dispose();
   }
 
-  void _handleSubmitted(String text) {
+  void _handleSubmitted(String text, AppStrings s) {
     if (text.trim().isEmpty) return;
 
     _textController.clear();
@@ -62,10 +72,10 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       _messages.add(ChatMessage(text: text, isUser: true));
     });
 
-    _generateAiResponse(text);
+    _generateAiResponse(text, s);
   }
 
-  void _toggleListening() {
+  void _toggleListening(AppStrings s) {
     setState(() {
       _isListening = !_isListening;
     });
@@ -76,13 +86,12 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         setState(() {
           _isListening = false;
         });
-        const spokenText = "Quelles parcelles nécessitent une irrigation ?";
-        _handleSubmitted(spokenText);
+        _handleSubmitted(s.tr('spoken_sample_question'), s);
       });
     }
   }
 
-  void _generateAiResponse(String userText) {
+  void _generateAiResponse(String userText, AppStrings s) {
     final provider = context.read<ParcelProvider>();
     final query = userText.toLowerCase().trim();
 
@@ -95,11 +104,11 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           query.contains(p.crop.toLowerCase()) ||
           query.contains(p.id.toLowerCase())) {
         final status = p.needsIrrigation
-            ? '⚠️ Attention : Humidité faible (${p.humidity.toStringAsFixed(1)}%), sous le seuil de ${p.threshold.toStringAsFixed(1)}%. Irrigation recommandée !'
-            : '✅ Statut parfait : Humidité de ${p.humidity.toStringAsFixed(1)}% (Seuil : ${p.threshold.toStringAsFixed(1)}%).';
+            ? '${s.tr('ai_parcel_alert')} (${p.humidity.toStringAsFixed(1)}%), ${s.tr('ai_under_threshold')} ${p.threshold.toStringAsFixed(1)}%. ${s.tr('ai_irrigation_recommended')}'
+            : '${s.tr('ai_status_perfect')} ${p.humidity.toStringAsFixed(1)}% (${s.tr('ai_threshold_parens')} : ${p.threshold.toStringAsFixed(1)}%).';
 
         response =
-            '📌 **${p.name}** (Culture : ${p.crop})\n• Surface : ${p.area} ha\n• Localisation : ${p.location}\n$status';
+        '📌 ${p.name} (${s.tr('crop_label')} : ${p.crop})\n• ${s.tr('ai_area_bullet')} : ${p.area} ha\n• ${s.tr('ai_location_bullet')} : ${p.location}\n$status';
         foundParcels = true;
         break;
       }
@@ -111,11 +120,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           query.contains('irriguer') ||
           query.contains('arrosage') ||
           query.contains('seuil') ||
-          query.contains('besoin')) {
+          query.contains('besoin') ||
+          query.contains('ري') ||
+          query.contains('irrigate') ||
+          query.contains('water')) {
         final count = provider.irrigationCount;
         if (count == 0) {
-          response =
-              '🎉 Excellente nouvelle ! Toutes vos ${provider.totalParcels} parcelles sont à un niveau d\'humidité idéal. Aucune action d\'irrigation n\'est nécessaire actuellement.';
+          response = s.tr('ai_all_humidity_ideal');
         } else {
           final lowParcels = provider.parcels
               .where((p) => p.needsIrrigation)
@@ -123,7 +134,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
               .join(', ');
 
           response =
-              '💧 Vous avez $count zone(s) sur ${provider.totalParcels} sous le seuil d\'irrigation : $lowParcels.\nJe vous conseille d\'activer l\'irrigation sur ces zones.';
+          '${s.tr('ai_zones_below_prefix')} $count ${s.tr('ai_zones_below_mid')} ${provider.totalParcels} ${s.tr('ai_zones_below_suffix')} $lowParcels.\n${s.tr('ai_advise_irrigate')}';
         }
       }
       // 3. Weather
@@ -131,38 +142,59 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           query.contains('meteo') ||
           query.contains('pluie') ||
           query.contains('temperature') ||
-          query.contains('température')) {
+          query.contains('température') ||
+          query.contains('طقس') ||
+          query.contains('weather')) {
         response =
-            '☀️ **Météo Kébili** :\n• Température : 30°C\n• Humidité de l\'air : 23%\n• Vent : 19 km/h\n• Prévisions : Pas de pluie significative prévue pour les 3 prochains jours.';
+        '${s.tr('ai_weather_kebili_title')}\n• ${s.tr('ai_temp_bullet')} : 30°C\n• ${s.tr('air_humidity_label')} : 23%\n• ${s.tr('wind_label')} : 19 km/h\n• ${s.tr('ai_forecast_bullet')}';
       }
       // 4. App usage & Guide
-      else if (query.contains('ajouter') || query.contains('creer') || query.contains('nouvelle')) {
-        response =
-            '➕ Pour **ajouter une parcelle** :\n1. Allez sur l\'onglet **Zones**.\n2. Appuyez sur le bouton vert flottant **+** en bas à droite.\n3. Remplissez le nom, le type de culture, la surface et le seuil d\'irrigation.';
-      } else if (query.contains('supprimer') || query.contains('effacer')) {
-        response =
-            '🗑️ Pour **supprimer une parcelle** :\nFaites un **appui long** (maintenez appuyé) sur la carte de la parcelle dans l\'onglet **Zones**. Une boîte de dialogue de confirmation vous permettra de valider la suppression.';
-      } else if (query.contains('qr') || query.contains('scanner') || query.contains('code')) {
-        response =
-          '📷 Pour utiliser le **QR Code** :\nAppuyez sur l\'icône de scanner QR en haut de l\'écran d\'accueil. Vous pourrez scanner vos capteurs ou générer un QR code pour chaque parcelle.';
-      } else if (query.contains('mot de passe') || query.contains('login') || query.contains('compte') || query.contains('email')) {
-        response =
-            '🔑 Pour la **réinitialisation du mot de passe** :\nSur l\'écran de connexion, cliquez sur *"Mot de passe oublié ?"*. Saisissez votre email et un lien sécurisé vous sera envoyé par Firebase.';
+      else if (query.contains('ajouter') ||
+          query.contains('creer') ||
+          query.contains('nouvelle') ||
+          query.contains('إضافة') ||
+          query.contains('add')) {
+        response = s.tr('ai_guide_add');
+      } else if (query.contains('supprimer') ||
+          query.contains('effacer') ||
+          query.contains('حذف') ||
+          query.contains('delete')) {
+        response = s.tr('ai_guide_delete');
+      } else if (query.contains('qr') ||
+          query.contains('scanner') ||
+          query.contains('code') ||
+          query.contains('مسح')) {
+        response = s.tr('ai_guide_qr');
+      } else if (query.contains('mot de passe') ||
+          query.contains('login') ||
+          query.contains('compte') ||
+          query.contains('email') ||
+          query.contains('كلمة المرور') ||
+          query.contains('password')) {
+        response = s.tr('ai_guide_password');
       }
       // 5. Agricultural tips
-      else if (query.contains('conseil') || query.contains('tomate') || query.contains('blé') || query.contains('olivier')) {
-        response =
-            '🌱 **Conseil Agricole AgriSmart** :\n- **Tomate** : Nécessite un sol constamment frais, maintenir au-dessus de 35% d\'humidité.\n- **Olivier** : Arrosage modéré, résistant à la sécheresse.\n- **Heure conseillée** : Irriguez tôt le matin ou tard le soir pour limiter l\'évaporation.';
+      else if (query.contains('conseil') ||
+          query.contains('tomate') ||
+          query.contains('blé') ||
+          query.contains('olivier') ||
+          query.contains('نصيحة') ||
+          query.contains('tip')) {
+        response = s.tr('ai_agri_tips');
       }
       // 6. General farm stats
-      else if (query.contains('stat') || query.contains('moyenne') || query.contains('surface') || query.contains('total')) {
+      else if (query.contains('stat') ||
+          query.contains('moyenne') ||
+          query.contains('surface') ||
+          query.contains('total') ||
+          query.contains('إحصائيات') ||
+          query.contains('summary')) {
         response =
-            '📊 **Résumé de votre exploitation** :\n• Total des parcelles : ${provider.totalParcels}\n• Surface totale : ${provider.totalArea.toStringAsFixed(1)} ha\n• Humidité moyenne : ${provider.averageHumidity.toStringAsFixed(1)}%\n• Humidité minimale : ${provider.minimumHumidity.toStringAsFixed(1)}%';
+        '${s.tr('ai_farm_summary_title')}\n• ${s.tr('ai_total_parcels_bullet')} : ${provider.totalParcels}\n• ${s.tr('ai_total_area_bullet')} : ${provider.totalArea.toStringAsFixed(1)} ha\n• ${s.tr('avg_humidity')} : ${provider.averageHumidity.toStringAsFixed(1)}%\n• ${s.tr('min_humidity')} : ${provider.minimumHumidity.toStringAsFixed(1)}%';
       }
       // 7. General fallback
       else {
-        response =
-            'Je suis à votre service ! Vous pouvez me demander par exemple :\n• *"Quelles parcelles irriguer ?"*\n• *"Comment supprimer une parcelle ?"*\n• *"Donne-moi l\'état de la Parcelle Nord"*\n• *"Quelle est la météo à Kébili ?"*';
+        response = s.tr('ai_fallback_help');
       }
     }
 
@@ -177,15 +209,17 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   @override
   Widget build(BuildContext context) {
     const darkGreen = Color(0xFF276738);
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F1),
       appBar: AppBar(
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
-        title: const Text(
-          'Assistant Vocal AgriSmart',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          s.tr('voice_assistant_title'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -197,7 +231,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: _toggleListening,
+                  onTap: () => _toggleListening(s),
                   child: AnimatedBuilder(
                     animation: _pulseController,
                     builder: (context, child) {
@@ -217,8 +251,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                             boxShadow: [
                               BoxShadow(
                                 color: (_isListening
-                                        ? const Color(0xFFE16A45)
-                                        : darkGreen)
+                                    ? const Color(0xFFE16A45)
+                                    : darkGreen)
                                     .withValues(alpha: 0.4),
                                 blurRadius: _isListening ? 20 : 8,
                                 spreadRadius: _isListening ? 6 : 2,
@@ -238,8 +272,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                 const SizedBox(height: 10),
                 Text(
                   _isListening
-                      ? 'Écoute en cours... Posez votre question'
-                      : 'Appuyez sur le micro pour parler',
+                      ? s.tr('listening_in_progress')
+                      : s.tr('tap_mic_to_speak'),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: _isListening
@@ -257,10 +291,10 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                _chipPrompt('Zones à irriguer ?'),
-                _chipPrompt('Comment supprimer une parcelle ?'),
-                _chipPrompt('Parcelle Nord ?'),
-                _chipPrompt('Météo Kébili'),
+                _chipPrompt(s.tr('chip_zones_to_irrigate'), s),
+                _chipPrompt(s.tr('chip_how_delete_parcel'), s),
+                _chipPrompt(s.tr('chip_north_parcel'), s),
+                _chipPrompt(s.tr('chip_kebili_weather'), s),
               ],
             ),
           ),
@@ -276,7 +310,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                 final msg = _messages[index];
                 return Align(
                   alignment:
-                      msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.symmetric(
@@ -325,7 +359,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                   child: TextField(
                     controller: _textController,
                     decoration: InputDecoration(
-                      hintText: 'Posez votre question à l\'assistant...',
+                      hintText: s.tr('ask_assistant_hint'),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
@@ -337,13 +371,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                         vertical: 12,
                       ),
                     ),
-                    onSubmitted: _handleSubmitted,
+                    onSubmitted: (val) => _handleSubmitted(val, s),
                   ),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.send, color: darkGreen),
-                  onPressed: () => _handleSubmitted(_textController.text),
+                  onPressed: () => _handleSubmitted(_textController.text, s),
                 ),
               ],
             ),
@@ -353,14 +387,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     );
   }
 
-  Widget _chipPrompt(String text) {
+  Widget _chipPrompt(String text, AppStrings s) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ActionChip(
         label: Text(text),
         backgroundColor: Colors.white,
         side: const BorderSide(color: Color(0xFF276738)),
-        onPressed: () => _handleSubmitted(text),
+        onPressed: () => _handleSubmitted(text, s),
       ),
     );
   }

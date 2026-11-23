@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/parcel.dart';
+import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
 import '../screens/parcel_form_screen.dart';
+import '../services/app_strings.dart';
 
 class ParcelCard extends StatelessWidget {
   final Parcel parcel;
@@ -17,11 +19,13 @@ class ParcelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
+    final s = AppStrings.of(context);
     final bool needsAttention = parcel.needsIrrigation;
 
     return InkWell(
       onTap: onTap ??
-          () {
+              () {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -29,7 +33,7 @@ class ParcelCard extends StatelessWidget {
               ),
             );
           },
-      onLongPress: () => _confirmDelete(context),
+      onLongPress: () => _confirmDelete(context, s),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
@@ -66,7 +70,7 @@ class ParcelCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Culture : ${parcel.crop}',
+                        '${s.tr('crop_label')} : ${parcel.crop}',
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontSize: 14,
@@ -74,7 +78,7 @@ class ParcelCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Humidité : ${parcel.humidity.toStringAsFixed(1)}% | Seuil : ${parcel.threshold.toStringAsFixed(1)}%',
+                        '${s.tr('humidity_short')} : ${parcel.humidity.toStringAsFixed(1)}% | ${s.tr('threshold_short')} : ${parcel.threshold.toStringAsFixed(1)}%',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -127,7 +131,7 @@ class ParcelCard extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context) {
+  void _confirmDelete(BuildContext context, AppStrings s) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -135,20 +139,20 @@ class ParcelCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         title: Row(
-          children: const [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 10),
-            Text('Confirmation'),
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            const SizedBox(width: 10),
+            Text(s.tr('confirmation_title')),
           ],
         ),
         content: Text(
-          'Voulez-vous vraiment supprimer la parcelle "${parcel.name}" ?',
+          '${s.tr('delete_parcel_confirm_prefix')} "${parcel.name}" ?',
           style: const TextStyle(fontSize: 15),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(s.tr('cancel')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -163,13 +167,13 @@ class ParcelCard extends StatelessWidget {
               Navigator.pop(dialogContext);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Parcelle supprimée avec succès'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(s.tr('parcel_deleted_success')),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
-            child: const Text('Supprimer'),
+            child: Text(s.tr('delete_action')),
           ),
         ],
       ),

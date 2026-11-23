@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'gps_farm_mapping_screen.dart';
+
 import '../providers/auth_provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/app_bottom_navigation.dart';
+import 'gps_farm_mapping_screen.dart';
 import 'home_screen.dart';
-import 'zones_screen.dart';
-import 'statistics_screen.dart';
-import 'profile_screen.dart';
 import 'login_screen.dart';
 import 'plant_recognition_screen.dart';
-import '../widgets/app_bottom_navigation.dart';
+import 'profile_screen.dart';
+import 'statistics_screen.dart';
+import 'zones_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -25,13 +27,14 @@ class _MainScreenState extends State<MainScreen> {
     ZonesScreen(),             // 1: Zones
     StatisticsScreen(),        // 2: Statistiques
     PlantRecognitionScreen(),  // 3: Plant Scan
-    GPSFarmMappingScreen(),    // 4: GPS Mapping (Localisation avant Profil)
+    GPSFarmMappingScreen(),    // 4: GPS Mapping
     ProfileScreen(),           // 5: Profil
   ];
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final langProvider = context.watch<LanguageProvider>();
 
     if (!authProvider.isAuthenticated) {
       return LoginScreen(
@@ -44,6 +47,7 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     return Scaffold(
+      key: ValueKey(langProvider.languageCode),
       body: IndexedStack(
         index: selectedIndex,
         children: pages,
