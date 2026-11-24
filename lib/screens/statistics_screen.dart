@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../providers/weather_provider.dart';
 import '../services/app_strings.dart';
+import '../widgets/weather_card.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
@@ -24,8 +26,11 @@ class StatisticsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F1),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
+        child: RefreshIndicator(
+          onRefresh: () => context.read<WeatherProvider>().load(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Light Green Header with Title
@@ -49,104 +54,8 @@ class StatisticsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Météo Card
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    s.tr('weather_kebili'),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    '30 °C',
-                                    style: TextStyle(
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '${s.tr('air_humidity_label')} : 23 %',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${s.tr('wind_label')} : 19 km/h',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          // 3-day Weather Rows
-                          _weatherForecastRow(
-                              s.tr('day_thu'), '15° / 30°', '0.0 mm'),
-                          _weatherForecastRow(
-                              s.tr('day_fri'), '17° / 26°', '0.0 mm'),
-                          _weatherForecastRow(
-                              s.tr('day_sat'), '15° / 25°', '0.0 mm'),
-
-                          const SizedBox(height: 14),
-
-                          // Weather Footer
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                s.tr('no_significant_rain'),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              Text(
-                                s.tr('updated_at_1435'),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Météo Card (données réelles Open-Meteo)
+                    const WeatherCard(),
 
                     const SizedBox(height: 20),
 
@@ -256,43 +165,8 @@ class StatisticsScreen extends StatelessWidget {
               ),
             ],
           ),
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _weatherForecastRow(String day, String temps, String rain) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: 55,
-            child: Text(
-              day,
-              style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
-            ),
-          ),
-          Text(
-            temps,
-            style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.water_drop_outlined,
-                size: 14,
-                color: Colors.black54,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                rain,
-                style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

@@ -74,6 +74,24 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     if (value == null || value.trim().isEmpty) {
       return s.tr('required_field');
     }
+    if (value.trim().length < 2) {
+      return s.tr('min_two_chars');
+    }
+    return null;
+  }
+
+  // Humidité / seuil : un nombre compris entre 0 et 100
+  String? _validatePercent(String? value, AppStrings s) {
+    if (value == null || value.trim().isEmpty) {
+      return s.tr('required_field');
+    }
+    final number = double.tryParse(value.trim().replaceAll(',', '.'));
+    if (number == null) {
+      return s.tr('invalid_number');
+    }
+    if (number < 0 || number > 100) {
+      return s.tr('percent_range');
+    }
     return null;
   }
 
@@ -360,7 +378,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                 icon: Icons.water_drop,
                 suffix: '%',
                 isNumeric: true,
-                validator: (v) => _validateNumber(v, s),
+                validator: (v) => _validatePercent(v, s),
               ),
               const SizedBox(height: 16),
               _buildField(
@@ -369,7 +387,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                 icon: Icons.tune,
                 suffix: '%',
                 isNumeric: true,
-                validator: (v) => _validateNumber(v, s),
+                validator: (v) => _validatePercent(v, s),
               ),
               const SizedBox(height: 30),
               SizedBox(

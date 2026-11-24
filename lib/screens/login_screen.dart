@@ -330,7 +330,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (v == null || v.trim().isEmpty) {
                         return s.tr('enter_email');
                       }
-                      if (!v.contains('@')) return s.tr('invalid_email');
+                      if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                          .hasMatch(v.trim())) {
+                        return s.tr('invalid_email');
+                      }
                       return null;
                     },
                   ),
@@ -377,7 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (v == null || v.trim().isEmpty) {
                         return s.tr('enter_password');
                       }
-                      if (v.length < 4) return s.tr('short_password');
+                      if (v.length < 6) return s.tr('password_min_6');
                       return null;
                     },
                   ),

@@ -7,6 +7,7 @@ import '../services/app_strings.dart';
 import '../widgets/parcel_card.dart';
 import '../widgets/smart_expiry_home_card.dart';
 import '../widgets/summary_card.dart';
+import '../widgets/weather_card.dart';
 import 'qr_scanner_screen.dart';
 import 'voice_assistant_screen.dart';
 
@@ -113,44 +114,8 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // WEATHER CARD
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.wb_sunny_rounded,
-                  color: Color(0xFFE5A329),
-                  size: 45,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        s.tr('weather_kebili'),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(s.tr('weather_sunny_no_rain')),
-                    ],
-                  ),
-                ),
-                const Text(
-                  '30°C',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // WEATHER CARD (données réelles Open-Meteo)
+          const WeatherSummaryCard(),
 
           const SizedBox(height: 16),
 

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
@@ -23,6 +22,9 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
+  // Utilisé par ParcelProvider pour savoir quelles parcelles charger
+  String? get uid => _user?.uid;
 
   String get userEmail => _user?.email ?? '';
   String get displayName => _user?.displayName ?? '';
@@ -103,6 +105,9 @@ class AuthProvider extends ChangeNotifier {
         message.contains('wrong-password') ||
         message.contains('invalid-credential')) {
       return 'Email ou mot de passe incorrect.';
+    }
+    if (message.contains('too-many-requests')) {
+      return 'Trop de tentatives, réessayez plus tard.';
     }
     if (message.contains('network-request-failed')) {
       return 'Vérifiez votre connexion Internet.';

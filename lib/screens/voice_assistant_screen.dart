@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../providers/weather_provider.dart';
 import '../services/app_strings.dart';
 
 class ChatMessage {
@@ -145,8 +146,16 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           query.contains('température') ||
           query.contains('طقس') ||
           query.contains('weather')) {
-        response =
-        '${s.tr('ai_weather_kebili_title')}\n• ${s.tr('ai_temp_bullet')} : 30°C\n• ${s.tr('air_humidity_label')} : 23%\n• ${s.tr('wind_label')} : 19 km/h\n• ${s.tr('ai_forecast_bullet')}';
+        final w = context.read<WeatherProvider>().weather;
+        if (w == null) {
+          response = s.tr('weather_unavailable');
+        } else {
+          final forecast = w.significantRain
+              ? '${s.tr('weather_rain_expected')} (${w.totalRain.toStringAsFixed(1)} mm) : ${s.tr('weather_postpone')}'
+              : s.tr('ai_forecast_bullet');
+          response =
+          '${s.tr('ai_weather_kebili_title')}\n• ${s.tr('ai_temp_bullet')} : ${w.temperature.toStringAsFixed(0)}°C\n• ${s.tr('air_humidity_label')} : ${w.airHumidity}%\n• ${s.tr('wind_label')} : ${w.wind.toStringAsFixed(0)} km/h\n• $forecast';
+        }
       }
       // 4. App usage & Guide
       else if (query.contains('ajouter') ||

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/parcel.dart';
 import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
-import '../screens/parcel_form_screen.dart';
+import '../screens/parcel_detail_screen.dart'; // 👈 Zidna hedha bech t7all page détails
 import '../services/app_strings.dart';
 
 class ParcelCard extends StatelessWidget {
@@ -24,12 +24,13 @@ class ParcelCard extends StatelessWidget {
     final bool needsAttention = parcel.needsIrrigation;
 
     return InkWell(
+      // 👇 Hna baddelna bech tmchi l ParcelDetailScreen w mch l form direct
       onTap: onTap ??
               () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ParcelFormScreen(parcel: parcel),
+                builder: (_) => ParcelDetailScreen(parcel: parcel),
               ),
             );
           },

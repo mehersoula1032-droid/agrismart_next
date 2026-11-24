@@ -1100,6 +1100,148 @@ class AppStrings {
       'ar': 'اطرح سؤالك على المساعد...',
       'en': 'Ask the assistant a question...',
     },
+
+    // --- Ajouts : météo réelle, validations, détail parcelle ---
+    'weather_loading': {
+      'fr': 'Chargement de la météo...',
+      'ar': 'جاري تحميل الطقس...',
+      'en': 'Loading weather...',
+    },
+    'weather_retry': {
+      'fr': 'Réessayer',
+      'ar': 'إعادة المحاولة',
+      'en': 'Retry',
+    },
+    'weather_updated_at': {
+      'fr': 'Mis à jour à',
+      'ar': 'محدّث في',
+      'en': 'Updated at',
+    },
+    'weather_rain_expected': {
+      'fr': 'Pluie prévue',
+      'ar': 'أمطار متوقعة',
+      'en': 'Rain expected',
+    },
+    'weather_postpone': {
+      'fr': 'repoussez l\'irrigation',
+      'ar': 'أجّل الري',
+      'en': 'postpone irrigation',
+    },
+    'weather_unavailable': {
+      'fr': 'Météo indisponible pour le moment. Vérifiez votre connexion.',
+      'ar': 'الطقس غير متاح حاليا. تحقق من اتصالك.',
+      'en': 'Weather is unavailable right now. Check your connection.',
+    },
+    'weather_err_timeout': {
+      'fr': 'Le serveur met trop de temps à répondre',
+      'ar': 'الخادم يستغرق وقتا طويلا للرد',
+      'en': 'The server is taking too long to respond',
+    },
+    'weather_err_network': {
+      'fr': 'Pas de connexion Internet',
+      'ar': 'لا يوجد اتصال بالإنترنت',
+      'en': 'No Internet connection',
+    },
+    'weather_err_server': {
+      'fr': 'Erreur du serveur météo',
+      'ar': 'خطأ في خادم الطقس',
+      'en': 'Weather server error',
+    },
+    'weather_err_parse': {
+      'fr': 'Réponse du serveur illisible',
+      'ar': 'استجابة الخادم غير مقروءة',
+      'en': 'Unreadable server response',
+    },
+    'weather_err_unknown': {
+      'fr': 'Erreur inattendue',
+      'ar': 'خطأ غير متوقع',
+      'en': 'Unexpected error',
+    },
+    'day_mon': {
+      'fr': 'Lun',
+      'ar': 'الاثنين',
+      'en': 'Mon',
+    },
+    'day_tue': {
+      'fr': 'Mar',
+      'ar': 'الثلاثاء',
+      'en': 'Tue',
+    },
+    'day_wed': {
+      'fr': 'Mer',
+      'ar': 'الأربعاء',
+      'en': 'Wed',
+    },
+    'day_sun': {
+      'fr': 'Dim',
+      'ar': 'الأحد',
+      'en': 'Sun',
+    },
+    'advice_wait_rain': {
+      'fr': 'Attendre la pluie',
+      'ar': 'انتظر المطر',
+      'en': 'Wait for the rain',
+    },
+    'advice_irrigate_now': {
+      'fr': 'Irriguer maintenant',
+      'ar': 'اسق الآن',
+      'en': 'Irrigate now',
+    },
+    'min_two_chars': {
+      'fr': '2 caractères minimum',
+      'ar': 'حرفان على الأقل',
+      'en': 'At least 2 characters',
+    },
+    'percent_range': {
+      'fr': 'La valeur doit être comprise entre 0 et 100',
+      'ar': 'يجب أن تكون القيمة بين 0 و 100',
+      'en': 'Value must be between 0 and 100',
+    },
+    'password_min_6': {
+      'fr': '6 caractères minimum',
+      'ar': '6 أحرف على الأقل',
+      'en': 'At least 6 characters',
+    },
+    'detail_needs_irrigation': {
+      'fr': 'Besoin d\'irrigation',
+      'ar': 'تحتاج إلى ري',
+      'en': 'Needs irrigation',
+    },
+    'detail_soil_ok': {
+      'fr': 'Sol correct',
+      'ar': 'تربة جيدة',
+      'en': 'Healthy soil',
+    },
+    'detail_current_humidity': {
+      'fr': 'Humidité actuelle',
+      'ar': 'الرطوبة الحالية',
+      'en': 'Current humidity',
+    },
+    'detail_threshold': {
+      'fr': 'Seuil d\'irrigation',
+      'ar': 'عتبة الري',
+      'en': 'Irrigation threshold',
+    },
+    'detail_valve': {
+      'fr': 'Vanne',
+      'ar': 'الصمام',
+      'en': 'Valve',
+    },
+    'detail_valve_open': {
+      'fr': 'Ouverte',
+      'ar': 'مفتوح',
+      'en': 'Open',
+    },
+    'detail_valve_closed': {
+      'fr': 'Fermée',
+      'ar': 'مغلق',
+      'en': 'Closed',
+    },
+    'detail_edit_parcel': {
+      'fr': 'Modifier cette zone',
+      'ar': 'تعديل هذه المنطقة',
+      'en': 'Edit this zone',
+    },
   };
 
   String tr(String key) {

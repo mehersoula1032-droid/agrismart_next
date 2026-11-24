@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/parcel_provider.dart';
+import '../providers/reglages_provider.dart';
 import '../services/app_strings.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class ProfileScreen extends StatelessWidget {
     final parcelProvider = context.watch<ParcelProvider>();
     final authProvider = context.watch<AuthProvider>();
     final langProvider = context.watch<LanguageProvider>();
+    final reglagesProvider = context.watch<ReglagesProvider>();
     final s = AppStrings.of(context);
     const darkGreen = Color(0xFF276738);
 
@@ -90,6 +92,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
+                          // ---- Langue ----
                           ListTile(
                             leading: const Icon(
                               Icons.language,
@@ -127,6 +130,55 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           const Divider(height: 1, indent: 16, endIndent: 16),
+
+                          // ---- THÈME (TP8) ----
+                          const ListTile(
+                            leading: Icon(
+                              Icons.brightness_6,
+                              color: darkGreen,
+                            ),
+                            title: Text(
+                              'Thème',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: SegmentedButton<ThemeMode>(
+                              style: SegmentedButton.styleFrom(
+                                selectedBackgroundColor: darkGreen,
+                                selectedForegroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF1B4332),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              segments: const [
+                                ButtonSegment<ThemeMode>(
+                                  value: ThemeMode.system,
+                                  label: Text('Système'),
+                                ),
+                                ButtonSegment<ThemeMode>(
+                                  value: ThemeMode.light,
+                                  label: Text('Clair'),
+                                ),
+                                ButtonSegment<ThemeMode>(
+                                  value: ThemeMode.dark,
+                                  label: Text('Sombre'),
+                                ),
+                              ],
+                              selected: <ThemeMode>{reglagesProvider.themeMode},
+                              onSelectionChanged: (Set<ThemeMode> choix) {
+                                context
+                                    .read<ReglagesProvider>()
+                                    .changerTheme(choix.first);
+                              },
+                            ),
+                          ),
+                          const Divider(height: 1, indent: 16, endIndent: 16),
+
+                          // ---- Zones suivies ----
                           ListTile(
                             leading: const Icon(
                               Icons.grass,
@@ -145,6 +197,8 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           const Divider(height: 1, indent: 16, endIndent: 16),
+
+                          // ---- À propos ----
                           ListTile(
                             leading: const Icon(
                               Icons.info_outline,
@@ -160,6 +214,8 @@ class ProfileScreen extends StatelessWidget {
                             },
                           ),
                           const Divider(height: 1, indent: 16, endIndent: 16),
+
+                          // ---- Se déconnecter ----
                           ListTile(
                             leading: const Icon(
                               Icons.logout,
