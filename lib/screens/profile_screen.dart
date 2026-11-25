@@ -254,7 +254,12 @@ class ProfileScreen extends StatelessWidget {
         ),
         title: Row(
           children: [
-            const Icon(Icons.agriculture, color: Color(0xFF276738)),
+            Image.asset(
+              'assets/images/app_logo.png',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+            ),
             const SizedBox(width: 10),
             Text(s.tr('app_name')),
           ],

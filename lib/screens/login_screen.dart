@@ -251,13 +251,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Color(0xFFEAF3E8),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.agriculture,
-                      size: 48,
-                      color: green,
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset(
+                          'assets/images/app_logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
 
                   Text(
