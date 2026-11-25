@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +29,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   late TextEditingController _lngController;
 
   bool get isEditing => widget.parcel != null;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -85,13 +87,17 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     if (value == null || value.trim().isEmpty) {
       return s.tr('required_field');
     }
+
     final number = double.tryParse(value.trim().replaceAll(',', '.'));
+
     if (number == null) {
       return s.tr('invalid_number');
     }
+
     if (number < 0 || number > 100) {
       return s.tr('percent_range');
     }
+
     return null;
   }
 
@@ -111,10 +117,11 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
 
   String? _validateCoordinate(String? value, AppStrings s) {
     if (value == null || value.trim().isEmpty) {
-      return null; // optionnel
+      return null;
     }
 
     final number = double.tryParse(value.replaceAll(',', '.'));
+
     if (number == null) {
       return s.tr('invalid_coordinate');
     }
@@ -135,7 +142,10 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       controller: controller,
       validator: validator,
       keyboardType: isNumeric
-          ? const TextInputType.numberWithOptions(decimal: true, signed: true)
+          ? const TextInputType.numberWithOptions(
+        decimal: true,
+        signed: true,
+      )
           : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
@@ -169,8 +179,14 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     });
   }
 
-  void _saveParcel(AppStrings s) {
+  Future<void> _saveParcel(AppStrings s) async {
+    if (_isSaving) return;
+
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSaving = true;
+    });
 
     final provider = context.read<ParcelProvider>();
 
@@ -181,8 +197,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     final longitude = lngText.isNotEmpty ? double.tryParse(lngText) : null;
 
     final parcel = Parcel(
-      id: widget.parcel?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+      id: widget.parcel?.id ?? '',
       name: _nameController.text.trim(),
       crop: _cropController.text.trim(),
       area: double.parse(_areaController.text.replaceAll(',', '.')),
@@ -193,24 +208,44 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       longitude: longitude,
     );
 
-    if (isEditing) {
-      provider.updateParcel(parcel);
-    } else {
-      provider.addParcel(parcel);
-    }
+    try {
+      if (isEditing) {
+        await provider.updateParcel(parcel);
+      } else {
+        await provider.addParcel(parcel);
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isEditing
-              ? s.tr('parcel_updated_success')
-              : s.tr('parcel_added_success'),
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isEditing
+                ? s.tr('parcel_updated_success')
+                : s.tr('parcel_added_success'),
+          ),
+          backgroundColor: const Color(0xFF2E7D32),
         ),
-        backgroundColor: const Color(0xFF2E7D32),
-      ),
-    );
+      );
 
-    Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
   }
 
   @override
@@ -329,10 +364,17 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                   ),
                   TextButton.icon(
                     onPressed: _setDefaultGpsCoordinates,
-                    icon: const Icon(Icons.my_location, size: 18, color: green),
+                    icon: const Icon(
+                      Icons.my_location,
+                      size: 18,
+                      color: green,
+                    ),
                     label: Text(
                       s.tr('ex_kebili'),
-                      style: const TextStyle(color: green, fontSize: 13),
+                      style: const TextStyle(
+                        color: green,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ],
@@ -394,12 +436,21 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: () => _saveParcel(s),
-                  icon: Icon(
-                    isEditing ? Icons.save : Icons.add,
-                  ),
+                  onPressed: _isSaving ? null : () => _saveParcel(s),
+                  icon: _isSaving
+                      ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Icon(isEditing ? Icons.save : Icons.add),
                   label: Text(
-                    isEditing
+                    _isSaving
+                        ? s.tr('loading')
+                        : isEditing
                         ? s.tr('save_changes_btn')
                         : s.tr('add_parcel_btn'),
                     style: const TextStyle(

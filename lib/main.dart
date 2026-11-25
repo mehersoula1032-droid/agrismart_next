@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,7 +19,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // TP8 : Ouvre le stockage une seule fois, au démarrage
+  // SharedPreferences reste utilisé par ReglagesProvider
   final prefs = await SharedPreferences.getInstance();
 
   runApp(
@@ -27,11 +28,15 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ReglagesProvider(prefs)),
-        // Météo réelle (Open-Meteo) : chargée dès le démarrage
-        ChangeNotifierProvider(create: (_) => WeatherProvider()..load()),
+
+        // Météo réelle (Open-Meteo)
         ChangeNotifierProvider(
-          create: (context) =>
-              ParcelProvider(prefs, context.read<AuthProvider>()),
+          create: (_) => WeatherProvider()..load(),
+        ),
+
+        // Parcelles : stockage via Spring Boot + MySQL
+        ChangeNotifierProvider(
+          create: (_) => ParcelProvider(),
         ),
       ],
       child: const AgriSmartApp(),

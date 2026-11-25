@@ -27,12 +27,9 @@ class Parcel {
 
   double get humidityRatio => (humidity / threshold).clamp(0.0, 1.5);
 
-  // ============ AJOUT TP8 : Sérialisation JSON ============
-
-  /// Convertit la parcelle en Map JSON (pour l'enregistrer sur l'appareil)
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'id': int.tryParse(id) ?? id,
       'name': name,
       'crop': crop,
       'area': area,
@@ -44,22 +41,19 @@ class Parcel {
     };
   }
 
-  /// Reconstruit une parcelle à partir d'un Map JSON
   factory Parcel.fromJson(Map<String, dynamic> json) {
     return Parcel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      crop: json['crop'] as String,
+      id: json['id'].toString(),
+      name: json['name'] ?? '',
+      crop: json['crop'] ?? '',
       area: (json['area'] as num).toDouble(),
       humidity: (json['humidity'] as num).toDouble(),
       threshold: (json['threshold'] as num).toDouble(),
-      location: json['location'] as String,
+      location: json['location'] ?? '',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
-
-  // ========================================================
 
   Parcel copyWith({
     String? id,

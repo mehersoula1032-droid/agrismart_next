@@ -1,24 +1,22 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../models/parcel.dart';
-import '../providers/auth_provider.dart';
-import '../services/mock_data_service.dart';
+import '../services/parcelle_api_service.dart';
 
 class ParcelProvider extends ChangeNotifier {
-  final SharedPreferences _prefs;
-  final AuthProvider _auth;
-  final List<Parcel> _parcels = [];
-  String? _uid; // utilisateur dont on affiche les parcelles
+  final ParcelleApiService _api = ParcelleApiService();
 
-  ParcelProvider(this._prefs, this._auth) {
-    _auth.addListener(_surChangementUtilisateur);
-    _actualiser(); // charge les parcelles de l'utilisateur déjà connecté
+  final List<Parcel> _parcels = [];
+  bool _isLoading = false;
+  String? _error;
+
+  ParcelProvider() {
+    loadParcels();
   }
 
   List<Parcel> get parcels => List.unmodifiable(_parcels);
+
+  bool get isLoading => _isLoading;
+  String? get error => _error;
 
   int get totalParcels => _parcels.length;
 
@@ -36,10 +34,12 @@ class ParcelProvider extends ChangeNotifier {
 
   double get averageHumidity {
     if (_parcels.isEmpty) return 0;
+
     final total = _parcels.fold<double>(
       0,
           (sum, parcel) => sum + parcel.humidity,
     );
+
     return total / _parcels.length;
   }
 
@@ -55,111 +55,112 @@ class ParcelProvider extends ChangeNotifier {
     }
   }
 
-  // --------- Stockage (TP8) ---------
+  // -------- CHARGEMENT --------
 
-  String _cle(String uid) => 'parcels_$uid';
+  Future<void> loadParcels() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
 
-  // Lit les parcelles d'un utilisateur (jeu de données au tout premier lancement)
-  List<Parcel> _lire(String uid) {
-    final texte = _prefs.getString(_cle(uid));
-    if (texte == null) return List.of(MockDataService.parcels);
     try {
-      final liste = jsonDecode(texte) as List<dynamic>;
-      return liste
-          .map((e) => Parcel.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } catch (_) {
-      // Données abîmées : on repart du jeu initial
-      return List.of(MockDataService.parcels);
+      final data = await _api.getParcelles();
+
+      _parcels.clear();
+      _parcels.addAll(data);
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // -------- HUMIDITE --------
+
+  Future<void> updateHumidity(String id, double humidity) async {
+    final index = _parcels.indexWhere((parcel) => parcel.id == id);
+    if (index == -1) return;
+
+    final updated = _parcels[index].copyWith(
+      humidity: humidity.clamp(0.0, 100.0),
+    );
+
+    await updateParcel(updated);
+  }
+
+  Future<void> increaseHumidity(String id, [double step = 5.0]) async {
+    final parcel = getParcelById(id);
+    if (parcel == null) return;
+
+    final newHumidity = (parcel.humidity + step).clamp(0.0, 100.0);
+
+    await updateHumidity(id, newHumidity);
+  }
+
+  Future<void> decreaseHumidity(String id, [double step = 5.0]) async {
+    final parcel = getParcelById(id);
+    if (parcel == null) return;
+
+    final newHumidity = (parcel.humidity - step).clamp(0.0, 100.0);
+
+    await updateHumidity(id, newHumidity);
+  }
+
+  // -------- AJOUT --------
+
+  Future<void> addParcel(Parcel parcel) async {
+    try {
+      final created = await _api.addParcelle(parcel);
+
+      _parcels.add(created);
+      _error = null;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
     }
   }
 
-  Future<void> _sauvegarder() async {
-    final uid = _uid;
-    if (uid == null) return;
-    final texte = jsonEncode(_parcels.map((p) => p.toJson()).toList());
-    await _prefs.setString(_cle(uid), texte);
-  }
+  // -------- MODIFICATION --------
 
-  // Change d'utilisateur : renvoie true si la liste a changé
-  bool _actualiser() {
-    final uid = _auth.uid;
-    if (uid == _uid) return false;
-    _uid = uid;
-    _parcels.clear();
-    if (uid != null) _parcels.addAll(_lire(uid));
-    return true;
-  }
-
-  void _surChangementUtilisateur() {
-    if (_actualiser()) notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _auth.removeListener(_surChangementUtilisateur);
-    super.dispose();
-  }
-
-  // --------- Actions ---------
-
-  void updateHumidity(String id, double humidity) {
-    final index = _parcels.indexWhere((parcel) => parcel.id == id);
-    if (index == -1) return;
-
-    _parcels[index] = _parcels[index].copyWith(
-      humidity: humidity.clamp(0.0, 100.0),
-    );
-    _sauvegarder();
-    notifyListeners();
-  }
-
-  void increaseHumidity(String id, [double step = 5.0]) {
-    final index = _parcels.indexWhere((parcel) => parcel.id == id);
-    if (index == -1) return;
-
-    final newHumidity = (_parcels[index].humidity + step).clamp(0.0, 100.0);
-    _parcels[index] = _parcels[index].copyWith(humidity: newHumidity);
-    _sauvegarder();
-    notifyListeners();
-  }
-
-  void decreaseHumidity(String id, [double step = 5.0]) {
-    final index = _parcels.indexWhere((parcel) => parcel.id == id);
-    if (index == -1) return;
-
-    final newHumidity = (_parcels[index].humidity - step).clamp(0.0, 100.0);
-    _parcels[index] = _parcels[index].copyWith(humidity: newHumidity);
-    _sauvegarder();
-    notifyListeners();
-  }
-
-  void addParcel(Parcel parcel) {
-    final exists = _parcels.any((p) => p.id == parcel.id);
-    if (exists) return;
-
-    _parcels.add(parcel);
-    _sauvegarder();
-    notifyListeners();
-  }
-
-  void updateParcel(Parcel updatedParcel) {
+  Future<void> updateParcel(Parcel updatedParcel) async {
     final index = _parcels.indexWhere(
           (parcel) => parcel.id == updatedParcel.id,
     );
-    if (index == -1) return;
 
-    _parcels[index] = updatedParcel;
-    _sauvegarder();
-    notifyListeners();
+    try {
+      final updated = await _api.updateParcelle(updatedParcel);
+
+      if (index != -1) {
+        _parcels[index] = updated;
+      }
+
+      _error = null;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 
-  void deleteParcel(String id) {
-    final exists = _parcels.any((parcel) => parcel.id == id);
-    if (!exists) return;
+  // -------- SUPPRESSION --------
 
-    _parcels.removeWhere((parcel) => parcel.id == id);
-    _sauvegarder();
-    notifyListeners();
+  Future<void> deleteParcel(String id) async {
+    final index = _parcels.indexWhere((parcel) => parcel.id == id);
+    if (index == -1) return;
+
+    try {
+      await _api.deleteParcelle(id);
+
+      _parcels.removeWhere((parcel) => parcel.id == id);
+      _error = null;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
   }
 }
