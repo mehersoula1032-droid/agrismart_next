@@ -4,7 +4,7 @@ import '../models/parcel.dart';
 
 class ParcelleApiService {
   // Android Emulator
-  static const String baseUrl = 'http://10.83.141.199:8080/api/parcelles';
+  static const String baseUrl = 'http://10.190.65.87:8080/api/parcelles';
   // Pour téléphone physique, remplacer 10.0.2.2 par l'IP locale du PC.
 
   Future<List<Parcel>> getParcelles() async {

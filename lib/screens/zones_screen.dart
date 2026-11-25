@@ -18,7 +18,7 @@ class ZonesScreen extends StatelessWidget {
     const darkGreen = Color(0xFF276738);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -59,16 +59,16 @@ class ZonesScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7F1),
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${s.tr('avg_humidity_label')} : ${provider.averageHumidity.toStringAsFixed(1)}%',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -78,7 +78,7 @@ class ZonesScreen extends StatelessWidget {
 
             // Top Summary Metrics bar
             Container(
-              color: const Color(0xFFF5F7F1),
+              color: Theme.of(context).scaffoldBackgroundColor,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

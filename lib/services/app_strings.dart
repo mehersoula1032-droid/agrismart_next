@@ -1242,6 +1242,26 @@ class AppStrings {
       'ar': 'تعديل هذه المنطقة',
       'en': 'Edit this zone',
     },
+    'theme_label': {
+      'fr': 'Thème',
+      'ar': 'المظهر',
+      'en': 'Theme',
+    },
+    'theme_system': {
+      'fr': 'Système',
+      'ar': 'النظام',
+      'en': 'System',
+    },
+    'theme_light': {
+      'fr': 'Clair',
+      'ar': 'فاتح',
+      'en': 'Light',
+    },
+    'theme_dark': {
+      'fr': 'Sombre',
+      'ar': 'داكن',
+      'en': 'Dark',
+    },
   };
 
   String tr(String key) {

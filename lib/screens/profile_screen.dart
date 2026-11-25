@@ -132,14 +132,14 @@ class ProfileScreen extends StatelessWidget {
                           const Divider(height: 1, indent: 16, endIndent: 16),
 
                           // ---- THÈME (TP8) ----
-                          const ListTile(
-                            leading: Icon(
+                          ListTile(
+                            leading: const Icon(
                               Icons.brightness_6,
                               color: darkGreen,
                             ),
                             title: Text(
-                              'Thème',
-                              style: TextStyle(fontWeight: FontWeight.w500),
+                              s.tr('theme_label'),
+                              style: const TextStyle(fontWeight: FontWeight.w500),
                             ),
                           ),
                           Padding(
@@ -154,18 +154,18 @@ class ProfileScreen extends StatelessWidget {
                                 foregroundColor: const Color(0xFF1B4332),
                                 visualDensity: VisualDensity.compact,
                               ),
-                              segments: const [
+                              segments: [
                                 ButtonSegment<ThemeMode>(
                                   value: ThemeMode.system,
-                                  label: Text('Système'),
+                                  label: Text(s.tr('theme_system')),
                                 ),
                                 ButtonSegment<ThemeMode>(
                                   value: ThemeMode.light,
-                                  label: Text('Clair'),
+                                  label: Text(s.tr('theme_light')),
                                 ),
                                 ButtonSegment<ThemeMode>(
                                   value: ThemeMode.dark,
-                                  label: Text('Sombre'),
+                                  label: Text(s.tr('theme_dark')),
                                 ),
                               ],
                               selected: <ThemeMode>{reglagesProvider.themeMode},

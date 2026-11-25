@@ -63,7 +63,7 @@ class StatisticsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -97,7 +97,6 @@ class StatisticsScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
                       ),
                     ),
 
@@ -108,7 +107,6 @@ class StatisticsScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
                       ),
                     ),
 
@@ -151,7 +149,7 @@ class StatisticsScreen extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: (parcel.humidity / 100).clamp(0.0, 1.0),
                                 minHeight: 7,
-                                backgroundColor: const Color(0xFFE7EDE4),
+                                backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.2),
                                 color: barColor,
                               ),
                             ),

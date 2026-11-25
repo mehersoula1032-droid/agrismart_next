@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/language_provider.dart';
@@ -31,6 +32,56 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _openCameraScanner(BuildContext context, AppStrings s, ParcelProvider provider) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(s.tr('scan_sensor_btn')),
+            backgroundColor: const Color(0xFF276738),
+            foregroundColor: Colors.white,
+          ),
+          body: MobileScanner(
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              for (final barcode in barcodes) {
+                final String? code = barcode.rawValue;
+                if (code != null) {
+                  Navigator.pop(context);
+                  _handleScannedCode(code, provider, s, context);
+                  break;
+                }
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleScannedCode(String code, ParcelProvider provider, AppStrings s, BuildContext context) {
+    final parcelId = code.startsWith('AGRISMART_PARCEL_')
+        ? code.replaceFirst('AGRISMART_PARCEL_', '')
+        : code;
+
+    final parcel = provider.getParcelById(parcelId) ??
+        (provider.parcels.isNotEmpty ? provider.parcels.first : null);
+
+    if (parcel != null) {
+      setState(() {
+        _scanResult = '${s.tr('sensor_prefix')} #${parcel.id}\n'
+            '${s.tr('zone_label')}: ${parcel.name}\n'
+            '${s.tr('measured_humidity_label')}: ${parcel.humidity.toStringAsFixed(1)}%';
+      });
+      _showScanDialog(context, parcel.name, parcel.humidity, s);
+    } else {
+      setState(() {
+        _scanResult = 'Code scanné: $code';
+      });
+    }
   }
 
   void _simulateScan(BuildContext context, AppStrings s) {
@@ -138,7 +189,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
     final s = AppStrings.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F1),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
@@ -212,21 +263,42 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 
                 const SizedBox(height: 30),
 
-                ElevatedButton.icon(
-                  onPressed: () => _simulateScan(context, s),
-                  icon: const Icon(Icons.camera_alt),
-                  label: Text(s.tr('scan_sensor_btn')),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: darkGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
-                      vertical: 14,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => _openCameraScanner(context, s, provider),
+                      icon: const Icon(Icons.camera_alt),
+                      label: Text(s.tr('scan_sensor_btn')),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: darkGreen,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      onPressed: () => _simulateScan(context, s),
+                      icon: const Icon(Icons.bolt),
+                      label: const Text('Simuler'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: darkGreen,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
 
                 if (_scanResult.isNotEmpty) ...[
@@ -234,7 +306,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -261,7 +333,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
 
                 if (provider.parcels.isNotEmpty) ...[
                   DropdownButtonFormField<String>(
-                    value: provider.parcels.any((p) => p.id == _selectedParcelId)
+                    initialValue: provider.parcels.any((p) => p.id == _selectedParcelId)
                         ? _selectedParcelId
                         : provider.parcels.first.id,
                     decoration: InputDecoration(
@@ -270,7 +342,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                         borderRadius: BorderRadius.circular(16),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Theme.of(context).cardColor,
                     ),
                     items: provider.parcels.map((parcel) {
                       return DropdownMenuItem(
@@ -294,7 +366,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
